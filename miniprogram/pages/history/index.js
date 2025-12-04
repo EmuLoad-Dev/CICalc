@@ -1,13 +1,19 @@
 // pages/history/index.js
+const templateUtils = require('../../utils/templates.js');
 
 Page({
   data: {
+    currentSegment: 0, // 0: 收藏记录, 1: 场景模板
+    swiperCurrent: 0, // swiper 当前索引
     historyList: [], // 历史记录列表
-    isEmpty: true // 是否为空
+    isEmpty: true, // 是否为空
+    templateList: [], // 模板列表（所有类型合并）
+    templateType: 'calc' // 当前选择的模板类型
   },
 
   onLoad: function () {
     this.loadHistoryList();
+    this.loadAllTemplates();
   },
 
   onShow: function () {
@@ -19,6 +25,207 @@ Page({
     }
     // 每次显示页面时重新加载历史记录（可能在其他页面有新的记录）
     this.loadHistoryList();
+    this.loadAllTemplates();
+  },
+
+  // Segment切换（点击顶栏）
+  onSegmentChange: function(e) {
+    const index = parseInt(e.currentTarget.dataset.index);
+    this.setData({
+      currentSegment: index,
+      swiperCurrent: index
+    });
+  },
+
+  // Swiper 滑动切换
+  onSwiperChange: function(e) {
+    const index = e.detail.current;
+    this.setData({
+      currentSegment: index,
+      swiperCurrent: index
+    });
+  },
+
+  // 加载所有模板
+  loadAllTemplates: function() {
+    try {
+      // 获取合并后的系统模板（每个模板包含三种计算模型）
+      const mergedTemplates = templateUtils.getAllMergedTemplates();
+      
+      // 获取所有类型的自定义模板（暂时保持原样，后续可以也合并）
+      const calcCustom = templateUtils.getCustomTemplates('calc');
+      const savingsCustom = templateUtils.getCustomTemplates('savings');
+      const annualCustom = templateUtils.getCustomTemplates('annual');
+      
+      // 合并所有模板
+      const allTemplates = [
+        ...mergedTemplates,
+        ...calcCustom,
+        ...savingsCustom,
+        ...annualCustom
+      ];
+      
+      this.setData({
+        templateList: allTemplates
+      });
+    } catch (e) {
+      console.error('加载模板失败:', e);
+    }
+  },
+
+  // 选择模板
+  onSelectTemplate: function(e) {
+    const template = e.currentTarget.dataset.template;
+    if (!template) {
+      wx.showToast({
+        title: '模板数据错误',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+    
+    // 先让用户选择计算模型类型
+    this.showCalcModelSelection(template);
+  },
+
+  // 显示计算模型选择
+  showCalcModelSelection: function(template) {
+    const options = [];
+    const availableTypes = [];
+    
+    // 检查模板有哪些可用的计算模型
+    if (template.calc) {
+      options.push('计算收益');
+      availableTypes.push('calc');
+    }
+    if (template.savings) {
+      options.push('存钱计划');
+      availableTypes.push('savings');
+    }
+    if (template.annual) {
+      options.push('计算年化');
+      availableTypes.push('annual');
+    }
+    
+    if (options.length === 0) {
+      wx.showToast({
+        title: '模板数据错误',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+    
+    // 如果只有一个选项，直接使用
+    if (options.length === 1) {
+      this.handleTemplateWithType(template, availableTypes[0]);
+      return;
+    }
+    
+    // 多个选项，让用户选择
+    wx.showActionSheet({
+      itemList: options,
+      success: (res) => {
+        const selectedType = availableTypes[res.tapIndex];
+        this.handleTemplateWithType(template, selectedType);
+      },
+      fail: (res) => {
+        // 用户取消选择
+      }
+    });
+  },
+
+  // 处理选定类型的模板
+  handleTemplateWithType: function(template, type) {
+    // 获取对应类型的数据
+    let templateData = null;
+    if (type === 'calc') {
+      templateData = template.calc;
+    } else if (type === 'savings') {
+      templateData = template.savings;
+    } else if (type === 'annual') {
+      templateData = template.annual;
+    }
+    
+    if (!templateData) {
+      wx.showToast({
+        title: '模板数据错误',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+    
+    // 检查目标页面是否有保存的数据
+    let hasData = false;
+    let storageKey = '';
+    
+    if (type === 'calc') {
+      storageKey = 'calc_page_data';
+    } else if (type === 'savings') {
+      storageKey = 'savings_page_data';
+    } else if (type === 'annual') {
+      storageKey = 'annual_page_data';
+    }
+
+    if (storageKey) {
+      try {
+        const savedData = wx.getStorageSync(storageKey);
+        hasData = savedData && Object.keys(savedData).length > 0;
+      } catch (e) {
+        console.error('检查数据失败:', e);
+      }
+    }
+
+    // 根据是否有数据，显示不同的提示内容
+    const typeNames = {
+      'calc': '计算收益',
+      'savings': '存钱计划',
+      'annual': '计算年化'
+    };
+    let content = '';
+    if (hasData) {
+      content = `确定要将"${template.name}"应用到${typeNames[type]}吗？\n\n注意：当前页面已有数据，应用模板后会覆盖现有数据。`;
+    } else {
+      content = `确定要将"${template.name}"应用到${typeNames[type]}吗？`;
+    }
+
+    // 询问是否应用模板
+    wx.showModal({
+      title: '应用模板',
+      content: content,
+      confirmText: '确定',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          this.doApplyTemplate(template, type, templateData);
+        }
+      }
+    });
+  },
+
+  // 执行应用模板
+  doApplyTemplate: function(template, type, templateData) {
+    // 使用全局数据存储要应用的模板
+    const app = getApp();
+    app.globalData.pendingLoadTemplate = templateData;
+    app.globalData.pendingLoadTemplateType = type;
+    
+    // 跳转到home页面
+    wx.switchTab({ url: '/pages/home/index' });
+    
+    // 提示用户
+    const typeNames = {
+      'calc': '计算收益',
+      'savings': '存钱计划',
+      'annual': '计算年化'
+    };
+    wx.showToast({
+      title: `已应用到${typeNames[type]}`,
+      icon: 'success',
+      duration: 2000
+    });
   },
 
   // 加载历史记录列表

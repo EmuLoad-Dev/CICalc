@@ -3,6 +3,8 @@ App({
   globalData: {
     pendingLoadRecord: null, // 待载入的记录数据
     pendingLoadRecordType: null, // 待载入的记录类型
+    pendingLoadTemplate: null, // 待载入的模板数据
+    pendingLoadTemplateType: null, // 待载入的模板类型
     // 去广告激励状态
     adFreeUntil: null, // 去广告有效期截止时间戳（毫秒），null表示未观看广告
     isAdFree: false, // 当前是否处于去广告状态（占位符，用于后续去除广告逻辑）

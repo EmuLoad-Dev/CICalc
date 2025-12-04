@@ -4,54 +4,6 @@
 // 计算收益页面模板
 const calcTemplates = [
   {
-    id: 'bank_deposit_1y',
-    name: '银行定期1年',
-    description: '银行1年期定期存款',
-    icon: '🏦',
-    type: 'calc',
-    data: {
-      principal: 100000,
-      fixedInvestment: 0,
-      fixedInvestmentType: 'monthly',
-      annualRate: '1.5',
-      duration: 1,
-      durationType: 'year',
-      compoundPeriod: 'year'
-    }
-  },
-  {
-    id: 'bank_deposit_3y',
-    name: '银行定期3年',
-    description: '银行3年期定期存款',
-    icon: '🏦',
-    type: 'calc',
-    data: {
-      principal: 100000,
-      fixedInvestment: 0,
-      fixedInvestmentType: 'monthly',
-      annualRate: '2.5',
-      duration: 3,
-      durationType: 'year',
-      compoundPeriod: 'year'
-    }
-  },
-  {
-    id: 'bank_deposit_5y',
-    name: '银行定期5年',
-    description: '银行5年期定期存款',
-    icon: '🏦',
-    type: 'calc',
-    data: {
-      principal: 100000,
-      fixedInvestment: 0,
-      fixedInvestmentType: 'monthly',
-      annualRate: '3.0',
-      duration: 5,
-      durationType: 'year',
-      compoundPeriod: 'year'
-    }
-  },
-  {
     id: 'money_fund',
     name: '货币基金',
     description: '货币基金（余额宝等）',
@@ -132,22 +84,6 @@ const calcTemplates = [
     }
   },
   {
-    id: 'p2p',
-    name: 'P2P理财',
-    description: 'P2P理财产品（高风险）',
-    icon: '⚠️',
-    type: 'calc',
-    data: {
-      principal: 50000,
-      fixedInvestment: 0,
-      fixedInvestmentType: 'monthly',
-      annualRate: '10.0',
-      duration: 12,
-      durationType: 'month',
-      compoundPeriod: 'month'
-    }
-  },
-  {
     id: 'treasury_bond',
     name: '国债',
     description: '国债投资',
@@ -167,20 +103,6 @@ const calcTemplates = [
 
 // 存钱计划页面模板
 const savingsTemplates = [
-  {
-    id: 'savings_bank',
-    name: '银行储蓄',
-    description: '通过银行储蓄达成目标',
-    icon: '🏦',
-    type: 'savings',
-    data: {
-      currentDeposit: 10000,
-      targetDeposit: 200000,
-      expectedAnnualRate: '2.0',
-      depositDuration: 60,
-      durationType: 'month'
-    }
-  },
   {
     id: 'savings_money_fund',
     name: '货币基金',
@@ -284,19 +206,6 @@ const savingsTemplates = [
 // 计算年化页面模板（较少，因为这是反推计算）
 const annualTemplates = [
   {
-    id: 'annual_bank',
-    name: '银行定期',
-    description: '银行定期存款收益',
-    icon: '🏦',
-    type: 'annual',
-    data: {
-      principal: 100000,
-      finalAmount: 107500,
-      duration: 3,
-      durationType: 'year'
-    }
-  },
-  {
     id: 'annual_fund',
     name: '基金投资',
     description: '基金投资收益',
@@ -336,6 +245,103 @@ function getTemplates(type) {
     default:
       return [];
   }
+}
+
+// 获取所有合并后的模板（每个模板包含三种计算模型的数据）
+function getAllMergedTemplates() {
+  // 创建一个映射，按模板名称和图标合并
+  const templateMap = new Map();
+  
+  // 名称映射表：将不同计算模型中的相同场景名称统一
+  const nameMapping = {
+    '基金投资': '货币基金',
+    '股票投资': '股票基金'
+  };
+  
+  // 处理计算收益模板
+  calcTemplates.forEach(template => {
+    const key = template.name + template.icon;
+    if (!templateMap.has(key)) {
+      templateMap.set(key, {
+        id: template.id,
+        name: template.name,
+        description: template.description,
+        icon: template.icon,
+        isSpecial: template.isSpecial,
+        options: template.options,
+        calc: template.isSpecial ? null : template.data,
+        savings: null,
+        annual: null
+      });
+    } else {
+      const existing = templateMap.get(key);
+      existing.calc = template.isSpecial ? null : template.data;
+      existing.isSpecial = template.isSpecial || existing.isSpecial;
+      existing.options = template.options || existing.options;
+    }
+  });
+  
+  // 处理存钱计划模板
+  savingsTemplates.forEach(template => {
+    // 尝试匹配现有模板（使用名称映射）
+    const normalizedName = nameMapping[template.name] || template.name;
+    const key = normalizedName + template.icon;
+    
+    if (templateMap.has(key)) {
+      const existing = templateMap.get(key);
+      existing.savings = template.data;
+    } else {
+      // 如果找不到匹配的，创建新模板
+      const newKey = template.name + template.icon;
+      if (!templateMap.has(newKey)) {
+        templateMap.set(newKey, {
+          id: template.id,
+          name: template.name,
+          description: template.description,
+          icon: template.icon,
+          isSpecial: false,
+          options: null,
+          calc: null,
+          savings: template.data,
+          annual: null
+        });
+      } else {
+        templateMap.get(newKey).savings = template.data;
+      }
+    }
+  });
+  
+  // 处理计算年化模板
+  annualTemplates.forEach(template => {
+    // 尝试匹配现有模板（使用名称映射）
+    const normalizedName = nameMapping[template.name] || template.name;
+    const key = normalizedName + template.icon;
+    
+    if (templateMap.has(key)) {
+      const existing = templateMap.get(key);
+      existing.annual = template.data;
+    } else {
+      // 如果找不到匹配的，创建新模板
+      const newKey = template.name + template.icon;
+      if (!templateMap.has(newKey)) {
+        templateMap.set(newKey, {
+          id: template.id,
+          name: template.name,
+          description: template.description,
+          icon: template.icon,
+          isSpecial: false,
+          options: null,
+          calc: null,
+          savings: null,
+          annual: template.data
+        });
+      } else {
+        templateMap.get(newKey).annual = template.data;
+      }
+    }
+  });
+  
+  return Array.from(templateMap.values());
 }
 
 // 根据ID获取模板
@@ -402,6 +408,7 @@ module.exports = {
   getTemplateById,
   getCustomTemplates,
   saveCustomTemplate,
-  deleteCustomTemplate
+  deleteCustomTemplate,
+  getAllMergedTemplates
 };
 
