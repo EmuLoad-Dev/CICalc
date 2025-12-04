@@ -344,9 +344,9 @@ def main():
     os.makedirs(icon_dir, exist_ok=True)
     
     # 创建图标
-    print("正在生成计算器图标...")
-    create_calculator_icon(os.path.join(icon_dir, "calc.png"), COLOR_NORMAL)
-    create_calculator_icon(os.path.join(icon_dir, "calc-active.png"), COLOR_ACTIVE)
+    print("正在生成计算器图标（使用存钱罐图标）...")
+    create_piggy_bank_icon(os.path.join(icon_dir, "calc.png"), COLOR_NORMAL)
+    create_piggy_bank_icon(os.path.join(icon_dir, "calc-active.png"), COLOR_ACTIVE)
     
     print("正在生成存钱罐图标...")
     create_piggy_bank_icon(os.path.join(icon_dir, "savings.png"), COLOR_NORMAL)

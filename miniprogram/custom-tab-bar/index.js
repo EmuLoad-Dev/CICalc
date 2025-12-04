@@ -10,8 +10,8 @@ Component({
       {
         pagePath: "/pages/home/index",
         text: "计算工具",
-        iconPath: "/images/calc.png",
-        selectedIconPath: "/images/calc-active.png"
+        iconPath: "/images/savings.png",
+        selectedIconPath: "/images/savings-active.png"
       },
       {
         pagePath: "/pages/history/index",
