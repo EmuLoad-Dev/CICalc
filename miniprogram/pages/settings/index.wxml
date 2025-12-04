@@ -1,0 +1,40 @@
+<!--pages/settings/index.wxml-->
+<view class="settings-container">
+  <view class="container">
+    <!-- 页面标题 -->
+    <view class="page-header">
+      <text class="page-title">设置</text>
+    </view>
+
+    <!-- 去广告功能区域 -->
+    <view class="settings-section">
+      <view class="section-title">去广告模式</view>
+      
+      <!-- 去广告激励按钮 -->
+      <view class="ad-free-section" wx:if="{{!isAdFreeActive}}">
+        <view class="ad-free-card">
+          <view class="ad-free-icon">🎁</view>
+          <view class="ad-free-content">
+            <text class="ad-free-title">观看视频去广告</text>
+            <text class="ad-free-desc">免费享受24小时无广告体验</text>
+          </view>
+          <view class="ad-free-btn" bindtap="onWatchAd">
+            <text>立即观看</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 去广告状态显示（已激活） -->
+      <view class="ad-free-status" wx:if="{{isAdFreeActive}}">
+        <view class="ad-free-status-card">
+          <view class="ad-free-status-icon">✨</view>
+          <view class="ad-free-status-content">
+            <text class="ad-free-status-title">已开启去广告模式</text>
+            <text class="ad-free-status-time">剩余时间：{{remainingTimeText}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+

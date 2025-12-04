@@ -18,6 +18,12 @@ Component({
         text: "收藏记录",
         iconPath: "/images/history.png",
         selectedIconPath: "/images/history-active.png"
+      },
+      {
+        pagePath: "/pages/settings/index",
+        text: "设置",
+        iconPath: "/images/settings.png",
+        selectedIconPath: "/images/settings-active.png"
       }
     ]
   },

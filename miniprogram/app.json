@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/home/index",
-    "pages/history/index"
+    "pages/history/index",
+    "pages/settings/index"
   ],
   "window": {
     "backgroundColor": "#FFFFFF",
@@ -25,6 +26,10 @@
       {
         "pagePath": "pages/history/index",
         "text": "收藏记录"
+      },
+      {
+        "pagePath": "pages/settings/index",
+        "text": "设置"
       }
     ]
   },

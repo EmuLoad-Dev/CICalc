@@ -279,6 +279,65 @@ def create_history_icon(filename, color):
     img.save(filename, 'PNG')
     print(f"已创建: {filename}")
 
+def create_settings_icon(filename, color):
+    """创建设置图标（齿轮样式）"""
+    img = Image.new('RGBA', (ICON_SIZE, ICON_SIZE), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(img)
+    
+    center_x = ICON_SIZE // 2
+    center_y = ICON_SIZE // 2
+    
+    # 绘制外圈齿轮
+    radius = 30
+    import math
+    
+    # 绘制齿轮外圈（8个齿）
+    num_teeth = 8
+    outer_radius = radius
+    inner_radius = radius - 6
+    
+    # 绘制齿轮主体（圆形）
+    draw.ellipse(
+        [center_x - inner_radius, center_y - inner_radius,
+         center_x + inner_radius, center_y + inner_radius],
+        fill=None,
+        outline=color,
+        width=3
+    )
+    
+    # 绘制齿轮齿
+    for i in range(num_teeth):
+        angle = math.radians(i * 360 / num_teeth)
+        # 外齿点
+        outer_x = center_x + outer_radius * math.cos(angle)
+        outer_y = center_y + outer_radius * math.sin(angle)
+        # 内齿点
+        inner_x = center_x + inner_radius * math.cos(angle)
+        inner_y = center_y + inner_radius * math.sin(angle)
+        
+        # 绘制齿（从内圈到外圈）
+        draw.line([inner_x, inner_y, outer_x, outer_y], fill=color, width=3)
+    
+    # 绘制内圈（小圆）
+    inner_circle_radius = 12
+    draw.ellipse(
+        [center_x - inner_circle_radius, center_y - inner_circle_radius,
+         center_x + inner_circle_radius, center_y + inner_circle_radius],
+        fill=None,
+        outline=color,
+        width=2
+    )
+    
+    # 绘制中心点
+    draw.ellipse(
+        [center_x - 3, center_y - 3, center_x + 3, center_y + 3],
+        fill=color,
+        outline=None
+    )
+    
+    img.save(filename, 'PNG')
+    print(f"已创建: {filename}")
+
 def main():
     # 确保目录存在
     icon_dir = "miniprogram/images"
@@ -300,6 +359,10 @@ def main():
     print("正在生成历史记录图标...")
     create_history_icon(os.path.join(icon_dir, "history.png"), COLOR_NORMAL)
     create_history_icon(os.path.join(icon_dir, "history-active.png"), COLOR_ACTIVE)
+    
+    print("正在生成设置图标...")
+    create_settings_icon(os.path.join(icon_dir, "settings.png"), COLOR_NORMAL)
+    create_settings_icon(os.path.join(icon_dir, "settings-active.png"), COLOR_ACTIVE)
     
     print("\n所有图标已生成完成！")
     print("图标文件保存在: miniprogram/images/")
