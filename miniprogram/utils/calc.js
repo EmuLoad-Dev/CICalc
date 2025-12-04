@@ -230,7 +230,9 @@ function generateTimeSeriesData(params) {
   const isMonthly = fixedInvestmentType === 'monthly';
   const investmentInterval = isMonthly ? 1 : 12; // 定投间隔（月）
 
-  // 按月逐步计算
+  // 按月逐步计算，确保与 calculateCompoundInterest 的逻辑完全一致
+  // 关键：使用与 calculateCompoundInterest 相同的计算方式
+  // 对于每个月，使用与 calculateCompoundInterest 相同的公式计算当前资产
   for (let month = 1; month <= totalMonths; month++) {
     // 判断是否需要定投（在复利计算之前投入）
     if (fixedInvestment > 0 && month % investmentInterval === 0) {
@@ -238,18 +240,29 @@ function generateTimeSeriesData(params) {
       currentInvestment += fixedInvestment;
     }
 
-    // 判断是否需要进行复利计算（根据复利周期）
+    // 判断是否需要进行复利计算（根据复利计算周期）
+    // 复利计算的逻辑必须与 calculateCompoundInterest 保持一致
+    // 但图表显示的是"当前时间点的资产值"，而不是"未来终值"
     let shouldCompound = false;
+    let compoundTimes = 1; // 这个月内需要复利的次数（按天复利时可能需要多次）
+    
     if (compoundPeriod === 'closed') {
       // 封闭期，只在最后一个月计算
       shouldCompound = month === totalMonths;
+    } else if (compoundPeriod === 'day') {
+      // 按天复利：每个月需要计算30次复利（假设每月30天）
+      const daysInMonth = 30;
+      compoundTimes = daysInMonth;
+      shouldCompound = periodRate > 0;
     } else {
-      // 其他周期，判断是否到了复利计算点
+      // 其他周期（年、月），判断是否到了复利计算点
+      // 对于"年"周期，每12个月计算一次；对于"月"周期，每个月计算一次
       const periodsPassed = month / periodMonths;
       shouldCompound = Math.floor(periodsPassed) > Math.floor((month - 1) / periodMonths);
     }
 
     // 应用复利（在定投之后）
+    // 注意：图表显示的是"当前时间点的资产值"，所以应该按实际复利计算，而不是计算未来终值
     if (shouldCompound && periodRate > 0) {
       if (compoundPeriod === 'closed') {
         // 封闭期：只对初始本金应用年化收益率，历时为总年数
@@ -259,8 +272,14 @@ function generateTimeSeriesData(params) {
         // 定投总额（不产生复利）
         const fixedInvestmentTotal = currentInvestment - initialPrincipal;
         currentAssets = principalWithInterest + fixedInvestmentTotal;
+      } else if (compoundPeriod === 'day') {
+        // 按天复利：这个月内每天计算一次复利
+        // 使用复合公式：currentAssets * (1 + periodRate) ^ compoundTimes
+        currentAssets = currentAssets * Math.pow(1 + periodRate, compoundTimes);
       } else {
-        // 其他周期：应用周期收益率
+        // 其他周期（年、月）：应用周期收益率
+        // 对于"年"周期，每12个月计算一次复利
+        // 对于"月"周期，每个月计算一次复利
         currentAssets = currentAssets * (1 + periodRate);
       }
     }

@@ -57,13 +57,21 @@ Component({
         .fields({ node: true, size: true })
         .exec((res) => {
           if (!res[0]) {
-            console.error('Canvas 初始化失败');
             return;
           }
 
           const canvas = res[0].node;
           const ctx = canvas.getContext('2d');
-          const dpr = wx.getSystemInfoSync().pixelRatio;
+          // 获取设备像素比，通过系统信息获取
+          let dpr = 1;
+          if (typeof wx !== 'undefined' && wx.getSystemInfoSync) {
+            try {
+              const systemInfo = wx.getSystemInfoSync();
+              dpr = systemInfo.pixelRatio || 1;
+            } catch (e) {
+              dpr = 1;
+            }
+          }
           
           const width = res[0].width;
           const height = res[0].height;
@@ -110,19 +118,12 @@ Component({
       const returnData = data.map(item => item.totalReturn);
 
       // 计算数据范围
-      const maxTime = Math.max(...timeData);
-      const minTime = Math.min(...timeData);
-      const maxValue = Math.max(
-        ...assetsData,
-        ...investmentData,
-        ...returnData
-      );
-      const minValue = Math.min(
-        ...assetsData,
-        ...investmentData,
-        ...returnData,
-        0 // 确保最小值至少为0
-      );
+      // 使用 apply 方法替代扩展运算符，避免 Babel runtime 依赖
+      const maxTime = timeData.length > 0 ? Math.max.apply(null, timeData) : 0;
+      const minTime = timeData.length > 0 ? Math.min.apply(null, timeData) : 0;
+      const allValues = assetsData.concat(investmentData, returnData);
+      const maxValue = allValues.length > 0 ? Math.max.apply(null, allValues) : 0;
+      const minValue = allValues.length > 0 ? Math.min.apply(null, allValues.concat([0])) : 0; // 确保最小值至少为0
 
       // 数据映射函数
       const mapX = (value) => {
