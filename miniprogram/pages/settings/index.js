@@ -3,12 +3,17 @@ Page({
   data: {
     // 去广告状态
     isAdFreeActive: false,
-    remainingTimeText: ''
+    remainingTimeText: '',
+    // 产品信息
+    productName: '',
+    appVersion: ''
   },
 
   onLoad: function (options) {
     // 检查去广告状态
     this.checkAdFreeStatus();
+    // 加载产品信息
+    this.loadProductInfo();
   },
 
   onShow: function () {
@@ -150,6 +155,19 @@ Page({
       title: '已获得24小时去广告体验',
       icon: 'success',
       duration: 2000
+    });
+  },
+
+  // ========== 产品信息相关方法 ==========
+  
+  loadProductInfo: function() {
+    const app = getApp();
+    const productName = app.getProductName();
+    const appVersion = app.getAppVersion();
+    
+    this.setData({
+      productName: productName,
+      appVersion: appVersion
     });
   }
 });

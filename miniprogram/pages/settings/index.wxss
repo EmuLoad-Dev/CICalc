@@ -13,29 +13,9 @@
   box-sizing: border-box;
 }
 
-/* 页面标题 */
-.page-header {
-  padding: 30rpx 0 20rpx 0;
-  border-bottom: 1rpx solid #F0F0F0;
-  margin-bottom: 30rpx;
-}
-
-.page-title {
-  font-size: 48rpx;
-  font-weight: 600;
-  color: #333333;
-}
-
 /* 设置区域 */
 .settings-section {
   margin-bottom: 30rpx;
-}
-
-.section-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #333333;
-  margin-bottom: 20rpx;
 }
 
 /* 去广告激励区域 */
@@ -173,4 +153,48 @@
   line-height: 1.2;
   font-weight: 500;
 }
+
+/* 信息卡片样式 */
+.info-card {
+  background: #FFFFFF;
+  border-radius: 15rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+  margin-top: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 30rpx;
+  padding-bottom: 30rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666666;
+  font-weight: 500;
+  min-width: 160rpx;
+  flex-shrink: 0;
+  margin-right: 20rpx;
+}
+
+.info-value {
+  font-size: 30rpx;
+  color: #333333;
+  line-height: 1.6;
+  flex: 1;
+  text-align: left;
+  word-break: break-all;
+  margin-top: -4rpx;
+}
+
 

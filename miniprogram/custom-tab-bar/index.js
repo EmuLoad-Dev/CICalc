@@ -9,19 +9,19 @@ Component({
     list: [
       {
         pagePath: "/pages/home/index",
-        text: "计算工具",
+        text: "计算",
         iconPath: "/images/savings.png",
         selectedIconPath: "/images/savings-active.png"
       },
       {
         pagePath: "/pages/history/index",
-        text: "收藏记录",
+        text: "收藏",
         iconPath: "/images/history.png",
         selectedIconPath: "/images/history-active.png"
       },
       {
         pagePath: "/pages/settings/index",
-        text: "设置",
+        text: "通用",
         iconPath: "/images/settings.png",
         selectedIconPath: "/images/settings-active.png"
       }

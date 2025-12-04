@@ -21,15 +21,15 @@
     "list": [
       {
         "pagePath": "pages/home/index",
-        "text": "计算工具"
+        "text": "计算"
       },
       {
         "pagePath": "pages/history/index",
-        "text": "收藏记录"
+        "text": "收藏"
       },
       {
         "pagePath": "pages/settings/index",
-        "text": "设置"
+        "text": "通用"
       }
     ]
   },
