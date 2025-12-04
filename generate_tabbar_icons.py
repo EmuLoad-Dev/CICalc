@@ -21,52 +21,64 @@ COLOR_NORMAL = (153, 153, 153)  # #999999 未选中状态
 COLOR_ACTIVE = (0, 122, 255)    # #007AFF 选中状态
 
 def create_calculator_icon(filename, color):
-    """创建计算器图标"""
+    """创建硬币图标 - 代表计算收益"""
     img = Image.new('RGBA', (ICON_SIZE, ICON_SIZE), (255, 255, 255, 0))
     draw = ImageDraw.Draw(img)
     
-    # 计算器主体
-    margin = 12
-    body_width = ICON_SIZE - margin * 2
-    body_height = ICON_SIZE - margin * 2
+    center_x = ICON_SIZE // 2
+    center_y = ICON_SIZE // 2
     
-    # 绘制计算器外框（圆角矩形）
-    draw.rounded_rectangle(
-        [margin, margin, ICON_SIZE - margin, ICON_SIZE - margin],
-        radius=8,
+    # 硬币半径
+    coin_radius = 28
+    
+    # 绘制硬币外圈（粗一点，代表硬币边缘）
+    draw.ellipse(
+        [center_x - coin_radius, center_y - coin_radius,
+         center_x + coin_radius, center_y + coin_radius],
         fill=None,
         outline=color,
         width=3
     )
     
-    # 绘制屏幕区域
-    screen_margin = 6
-    screen_y = margin + screen_margin
-    screen_height = body_height * 0.25
-    draw.rounded_rectangle(
-        [margin + screen_margin, screen_y, 
-         ICON_SIZE - margin - screen_margin, screen_y + screen_height],
-        radius=4,
-        fill=color,
-        outline=None
+    # 绘制硬币内圈（细一点，增加层次感）
+    inner_radius = coin_radius - 4
+    draw.ellipse(
+        [center_x - inner_radius, center_y - inner_radius,
+         center_x + inner_radius, center_y + inner_radius],
+        fill=None,
+        outline=color,
+        width=1
     )
     
-    # 绘制按钮（3x4网格）
-    button_start_y = screen_y + screen_height + 8
-    button_size = (body_width - screen_margin * 2) / 4
-    button_spacing = 4
+    # 绘制人民币符号 ￥（简约设计）
+    # 使用线条绘制一个简约的￥符号
+    # 竖线
+    draw.line(
+        [center_x, center_y - 12, center_x, center_y + 12],
+        fill=color,
+        width=2
+    )
     
-    for row in range(3):
-        for col in range(4):
-            x = margin + screen_margin + col * (button_size + button_spacing)
-            y = button_start_y + row * (button_size + button_spacing)
-            draw.rounded_rectangle(
-                [x, y, x + button_size - button_spacing, y + button_size - button_spacing],
-                radius=3,
-                fill=None,
-                outline=color,
-                width=2
-            )
+    # 顶部横线
+    draw.line(
+        [center_x - 8, center_y - 8, center_x + 8, center_y - 8],
+        fill=color,
+        width=2
+    )
+    
+    # 中间横线
+    draw.line(
+        [center_x - 6, center_y, center_x + 6, center_y],
+        fill=color,
+        width=2
+    )
+    
+    # 底部横线
+    draw.line(
+        [center_x - 8, center_y + 8, center_x + 8, center_y + 8],
+        fill=color,
+        width=2
+    )
     
     img.save(filename, 'PNG')
     print(f"已创建: {filename}")

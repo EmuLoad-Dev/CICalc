@@ -41,7 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
 }
 
 .tab-bar-icon-img {
