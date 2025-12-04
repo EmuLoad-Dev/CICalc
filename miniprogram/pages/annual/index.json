@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "计算年化",
-  "usingComponents": {
-    "chart": "../../components/chart/index"
-  }
-}
-

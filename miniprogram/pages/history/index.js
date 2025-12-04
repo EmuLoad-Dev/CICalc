@@ -329,7 +329,7 @@ Page({
   onShareAppMessage: function() {
     return {
       title: '极简复利计算器 - 专业的理财计算工具',
-      path: '/pages/calc/index',
+      path: '/pages/home/index',
       imageUrl: '' // 可以设置分享图片
     };
   },
