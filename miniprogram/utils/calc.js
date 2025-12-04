@@ -58,12 +58,21 @@ function calculateCompoundInterest(params) {
 
   // 计算周期数
   const periods = periodMonths > 0 ? totalMonths / periodMonths : 0;
-  const periodRate = annualRate * (periodMonths / 12); // 每个周期的收益率
+  // 封闭期特殊处理：使用年化收益率，历时为总年数
+  let periodRate;
+  let periodsForCalculation;
+  if (compoundPeriod === 'closed') {
+    periodRate = annualRate; // 封闭期使用年化收益率
+    periodsForCalculation = totalMonths / 12; // 封闭期历时为总年数
+  } else {
+    periodRate = annualRate * (periodMonths / 12); // 每个周期的收益率
+    periodsForCalculation = periods;
+  }
 
   // 计算本金部分的复利
   let principalFinal = principal;
-  if (principal > 0 && periods > 0 && periodRate > 0) {
-    principalFinal = principal * Math.pow(1 + periodRate, periods);
+  if (principal > 0 && periodsForCalculation > 0 && periodRate > 0) {
+    principalFinal = principal * Math.pow(1 + periodRate, periodsForCalculation);
   }
 
   // 计算定投部分的复利
@@ -79,25 +88,36 @@ function calculateCompoundInterest(params) {
     }
 
     // 计算定投的复利终值
-    // 使用年金终值公式：FV = PMT * (((1+r)^n - 1) / r)
-    // 其中 r 是每期的收益率，n 是定投次数
-    if (fixedInvestmentType === 'yearly') {
-      // 每年定投，使用年化收益率
-      const yearlyRate = annualRate;
-      if (yearlyRate > 0 && totalInvestments > 0) {
-        const annuityFactor = (Math.pow(1 + yearlyRate, totalInvestments) - 1) / yearlyRate;
-        fixedInvestmentFinal = fixedInvestment * annuityFactor;
-      } else {
-        fixedInvestmentFinal = fixedInvestment * totalInvestments;
-      }
-    } else { // monthly
-      // 每月定投，使用月化收益率
-      const monthlyRate = annualRate / 12;
-      if (monthlyRate > 0 && totalInvestments > 0) {
-        const annuityFactor = (Math.pow(1 + monthlyRate, totalInvestments) - 1) / monthlyRate;
-        fixedInvestmentFinal = fixedInvestment * annuityFactor;
-      } else {
-        fixedInvestmentFinal = fixedInvestment * totalInvestments;
+    // 需要根据复利计算周期来正确计算每笔定投的复利
+    // 使用逐笔计算方式，确保与时间序列生成逻辑一致
+    
+    if (compoundPeriod === 'closed') {
+      // 封闭期：定投部分不产生复利，只计算本金（简单累加）
+      fixedInvestmentFinal = fixedInvestment * totalInvestments;
+    } else {
+      // 非封闭期：逐笔计算每期定投的复利终值
+      const isMonthly = fixedInvestmentType === 'monthly';
+      const investmentInterval = isMonthly ? 1 : 12; // 定投间隔（月）
+      
+      // 计算每笔定投的复利终值
+      for (let month = 1; month <= totalMonths; month++) {
+        // 判断是否在这个月定投
+        if (month % investmentInterval === 0) {
+          // 计算这笔定投在剩余时间内产生的复利
+          const remainingMonths = totalMonths - month;
+          if (remainingMonths > 0) {
+            // 计算剩余时间内的复利周期数
+            const remainingPeriods = remainingMonths / periodMonths;
+            if (remainingPeriods > 0 && periodRate > 0) {
+              fixedInvestmentFinal += fixedInvestment * Math.pow(1 + periodRate, remainingPeriods);
+            } else {
+              fixedInvestmentFinal += fixedInvestment;
+            }
+          } else {
+            // 最后一期定投，不产生复利
+            fixedInvestmentFinal += fixedInvestment;
+          }
+        }
       }
     }
   }
@@ -178,7 +198,13 @@ function generateTimeSeriesData(params) {
     periodMonths = totalMonths;
   }
 
-  const periodRate = annualRate * (periodMonths / 12); // 每个周期的收益率
+  // 封闭期特殊处理：使用年化收益率，历时为总年数
+  let periodRate;
+  if (compoundPeriod === 'closed') {
+    periodRate = annualRate; // 封闭期使用年化收益率
+  } else {
+    periodRate = annualRate * (periodMonths / 12); // 每个周期的收益率
+  }
   const periods = periodMonths > 0 ? totalMonths / periodMonths : 0;
 
   // 生成时间序列数据点
@@ -187,6 +213,7 @@ function generateTimeSeriesData(params) {
   // 初始状态（第0个月）
   let currentAssets = principal; // 当前资产
   let currentInvestment = principal; // 累计投入
+  const initialPrincipal = principal; // 保存初始本金，用于封闭期计算
   dataPoints.push({
     time: 0,
     totalAssets: currentAssets,
@@ -224,7 +251,18 @@ function generateTimeSeriesData(params) {
 
     // 应用复利（在定投之后）
     if (shouldCompound && periodRate > 0) {
-      currentAssets = currentAssets * (1 + periodRate);
+      if (compoundPeriod === 'closed') {
+        // 封闭期：只对初始本金应用年化收益率，历时为总年数
+        // 定投金额不产生复利，只累加本金
+        const years = totalMonths / 12;
+        const principalWithInterest = initialPrincipal * Math.pow(1 + periodRate, years);
+        // 定投总额（不产生复利）
+        const fixedInvestmentTotal = currentInvestment - initialPrincipal;
+        currentAssets = principalWithInterest + fixedInvestmentTotal;
+      } else {
+        // 其他周期：应用周期收益率
+        currentAssets = currentAssets * (1 + periodRate);
+      }
     }
 
     // 记录数据点（每个月记录一次，或者根据数据量决定采样频率）
