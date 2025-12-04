@@ -93,8 +93,11 @@
     </view>
   </view>
 
-  <!-- 收藏记录按钮 -->
+  <!-- 分享和收藏按钮 -->
   <view class="favorite-btn-wrapper">
+    <button class="share-btn" open-type="share">
+      <text>分享结果</text>
+    </button>
     <view class="favorite-btn" bindtap="onSaveRecord">
       <text>收藏记录</text>
     </view>

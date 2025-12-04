@@ -33,7 +33,41 @@ Page({
     }
   },
 
-  onLoad: function () {
+  onLoad: function (options) {
+    // 检查是否有分享参数
+    if (options.share === 'true' && options.data) {
+      try {
+        const shareData = JSON.parse(decodeURIComponent(options.data));
+        // 保存分享数据到实例，等待用户确认
+        this.shareData = shareData;
+        // 询问用户是否载入数据
+        wx.showModal({
+          title: '载入分享数据',
+          content: '检测到分享的计算数据，是否载入？',
+          confirmText: '载入',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              // 用户确认，载入分享数据
+              this.loadFromShareData(this.shareData);
+            } else {
+              // 用户取消，正常加载保存的数据
+              this.loadSavedData();
+              this.calculate();
+            }
+          },
+          fail: () => {
+            // 对话框失败，正常加载保存的数据
+            this.loadSavedData();
+            this.calculate();
+          }
+        });
+        return;
+      } catch (e) {
+        console.error('解析分享数据失败:', e);
+      }
+    }
+    
     // 恢复保存的数据
     this.loadSavedData();
     this.calculate();
@@ -507,12 +541,77 @@ Page({
   },
 
 
-  // 分享计算结果
-  onShare: function() {
-    wx.showToast({
-      title: '分享功能待实现',
-      icon: 'none'
-    });
+  // 从分享数据载入
+  loadFromShareData: function(shareData) {
+    try {
+      this.setData({
+        currentDeposit: parseFloat(shareData.currentDeposit) || 0,
+        targetDeposit: parseFloat(shareData.targetDeposit) || 0,
+        expectedAnnualRate: shareData.expectedAnnualRate || '0',
+        depositDuration: parseFloat(shareData.depositDuration) || 0,
+        durationType: shareData.durationType || 'month'
+      });
+      // 保存到本地存储
+      this.saveData();
+      this.calculate();
+      
+      wx.showToast({
+        title: '已载入分享数据',
+        icon: 'success',
+        duration: 2000
+      });
+    } catch (e) {
+      console.error('载入分享数据失败:', e);
+      // 如果载入失败，使用默认数据
+      this.loadSavedData();
+      this.calculate();
+    }
+  },
+
+  // 分享到微信好友/群
+  onShareAppMessage: function() {
+    const {
+      currentDeposit,
+      targetDeposit,
+      expectedAnnualRate,
+      depositDuration,
+      durationType,
+      monthlyDeposit,
+      totalInvestment,
+      finalAssets,
+      finalReturn,
+      totalReturnRate
+    } = this.data;
+
+    // 检查是否有有效结果
+    if (parseFloat(monthlyDeposit) <= 0 && parseFloat(totalInvestment) <= 0) {
+      return {
+        title: '存钱计划计算结果',
+        path: '/pages/savings/index'
+      };
+    }
+
+    // 构建分享数据，用于打开后自动填充
+    const shareData = {
+      currentDeposit: currentDeposit,
+      targetDeposit: targetDeposit,
+      expectedAnnualRate: expectedAnnualRate,
+      depositDuration: depositDuration,
+      durationType: durationType
+    };
+
+    // 构建分享标题
+    const durationUnit = durationType === 'year' ? '年' : durationType === 'month' ? '月' : '天';
+    let shareTitle = `存钱计划：当前${currentDeposit}元，目标${targetDeposit}元，每月存${monthlyDeposit}元，年化${expectedAnnualRate}%，历时${depositDuration}${durationUnit}`;
+    if (shareTitle.length > 30) {
+      shareTitle = `存钱计划：每月存${monthlyDeposit}元，最终资产${finalAssets}元`;
+    }
+
+    return {
+      title: shareTitle,
+      path: `/pages/savings/index?share=true&data=${encodeURIComponent(JSON.stringify(shareData))}`,
+      imageUrl: '' // 可以设置分享图片
+    };
   },
 
   // 长按分享按钮清除数据
