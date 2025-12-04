@@ -243,8 +243,186 @@ function generateTimeSeriesData(params) {
   return dataPoints;
 }
 
+/**
+ * 生成年化收益率计算的时间序列数据（用于图表可视化）
+ * @param {Object} params 参数对象
+ * @param {Number} params.principal 本金
+ * @param {Number} params.finalAmount 最终金额
+ * @param {Number} params.duration 投资时长
+ * @param {String} params.durationType 时长类型：year/month/day
+ * @returns {Array} 时间序列数据数组，每个元素包含 { time, totalAssets, totalInvestment, totalReturn }
+ */
+function generateAnnualTimeSeriesData(params) {
+  const {
+    principal = 0,
+    finalAmount = 0,
+    duration = 0,
+    durationType = 'year'
+  } = params;
+
+  // 如果输入无效，返回空数组
+  if (principal <= 0 || finalAmount <= 0 || duration <= 0) {
+    return [];
+  }
+
+  // 将时长统一转换为月数
+  let totalMonths = 0;
+  if (durationType === 'year') {
+    totalMonths = duration * 12;
+  } else if (durationType === 'month') {
+    totalMonths = duration;
+  } else {
+    totalMonths = duration / 30; // 天数转月数
+  }
+
+  // 计算年化收益率
+  const years = totalMonths / 12;
+  let annualizedRate = 0;
+  if (years > 0) {
+    annualizedRate = Math.pow(finalAmount / principal, 1 / years) - 1;
+  }
+
+  // 生成时间序列数据点
+  const dataPoints = [];
+  
+  // 初始状态（第0个月）
+  dataPoints.push({
+    time: 0,
+    totalAssets: principal,
+    totalInvestment: principal,
+    totalReturn: 0
+  });
+
+  // 如果总月数为0，只返回初始点
+  if (totalMonths <= 0) {
+    return dataPoints;
+  }
+
+  // 按月计算资产增长
+  const monthlyRate = annualizedRate / 12;
+  
+  // 如果总月数超过100，则每N个月记录一次以减少数据点
+  const sampleInterval = totalMonths > 100 ? Math.ceil(totalMonths / 100) : 1;
+  
+  for (let month = 1; month <= totalMonths; month++) {
+    // 计算当前资产（复利增长）
+    const currentAssets = principal * Math.pow(1 + monthlyRate, month);
+    const currentReturn = currentAssets - principal;
+    
+    // 记录数据点
+    if (month % sampleInterval === 0 || month === totalMonths) {
+      dataPoints.push({
+        time: month,
+        totalAssets: currentAssets,
+        totalInvestment: principal,
+        totalReturn: currentReturn
+      });
+    }
+  }
+
+  return dataPoints;
+}
+
+/**
+ * 生成存钱计划的时间序列数据（用于图表可视化）
+ * @param {Object} params 参数对象
+ * @param {Number} params.currentDeposit 当前存款
+ * @param {Number} params.targetDeposit 目标存款
+ * @param {Number} params.expectedAnnualRate 预期年化收益率（小数形式，如0.035表示3.5%）
+ * @param {Number} params.depositDuration 存款时长
+ * @param {String} params.durationType 时长类型：year/month/day
+ * @returns {Array} 时间序列数据数组，每个元素包含 { time, totalAssets, totalInvestment, totalReturn }
+ */
+function generateSavingsTimeSeriesData(params) {
+  const {
+    currentDeposit = 0,
+    targetDeposit = 0,
+    expectedAnnualRate = 0,
+    depositDuration = 0,
+    durationType = 'month'
+  } = params;
+
+  // 如果输入无效，返回空数组
+  if (currentDeposit < 0 || targetDeposit <= 0 || depositDuration <= 0) {
+    return [];
+  }
+
+  // 将存款时长统一转换为月数
+  let totalMonths = 0;
+  if (durationType === 'year') {
+    totalMonths = depositDuration * 12;
+  } else if (durationType === 'month') {
+    totalMonths = depositDuration;
+  } else {
+    totalMonths = depositDuration / 30; // 天数转月数
+  }
+
+  // 计算每月需要存入的金额
+  const monthlyRate = expectedAnnualRate / 12;
+  const months = totalMonths;
+  
+  const futureValueOfCurrent = currentDeposit * Math.pow(1 + monthlyRate, months);
+  const remainingNeeded = targetDeposit - futureValueOfCurrent;
+  
+  let monthlyDeposit = 0;
+  if (remainingNeeded > 0) {
+    const annuityFactor = (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate;
+    monthlyDeposit = remainingNeeded / annuityFactor;
+  }
+
+  // 生成时间序列数据点
+  const dataPoints = [];
+  
+  // 初始状态（第0个月）
+  dataPoints.push({
+    time: 0,
+    totalAssets: currentDeposit,
+    totalInvestment: currentDeposit,
+    totalReturn: 0
+  });
+
+  // 如果总月数为0，只返回初始点
+  if (totalMonths <= 0) {
+    return dataPoints;
+  }
+
+  // 按月逐步计算
+  let currentAssets = currentDeposit;
+  let currentInvestment = currentDeposit;
+  
+  // 如果总月数超过100，则每N个月记录一次以减少数据点
+  const sampleInterval = totalMonths > 100 ? Math.ceil(totalMonths / 100) : 1;
+  
+  for (let month = 1; month <= totalMonths; month++) {
+    // 每月存入
+    if (monthlyDeposit > 0) {
+      currentAssets += monthlyDeposit;
+      currentInvestment += monthlyDeposit;
+    }
+    
+    // 应用复利
+    if (monthlyRate > 0) {
+      currentAssets = currentAssets * (1 + monthlyRate);
+    }
+    
+    // 记录数据点
+    if (month % sampleInterval === 0 || month === totalMonths) {
+      dataPoints.push({
+        time: month,
+        totalAssets: currentAssets,
+        totalInvestment: currentInvestment,
+        totalReturn: currentAssets - currentInvestment
+      });
+    }
+  }
+
+  return dataPoints;
+}
+
 module.exports = {
   calculateCompoundInterest,
-  generateTimeSeriesData
+  generateTimeSeriesData,
+  generateAnnualTimeSeriesData,
+  generateSavingsTimeSeriesData
 };
 

@@ -1,4 +1,5 @@
 // pages/savings/index.js
+const calcUtils = require('../../utils/calc.js');
 
 Page({
   data: {
@@ -15,6 +16,9 @@ Page({
     finalReturn: 0, // 最终收益
     totalReturnRate: 0, // 总收益率
     monthlyDeposit: 0, // 每月存入
+    
+    // 图表数据
+    chartData: [],
     
     // 边界值常量
     BOUNDS: {
@@ -377,12 +381,22 @@ Page({
     const finalReturn = finalAssets - totalInvestment;
     const totalReturnRate = totalInvestment > 0 ? (finalReturn / totalInvestment) : 0;
 
+    // 生成时间序列数据用于图表
+    const chartData = calcUtils.generateSavingsTimeSeriesData({
+      currentDeposit,
+      targetDeposit,
+      expectedAnnualRate: annualRateNum / 100, // 转换为小数
+      depositDuration,
+      durationType
+    });
+
     this.setData({
       monthlyDeposit: this.formatNumber(monthlyDeposit),
       totalInvestment: this.formatNumber(totalInvestment),
       finalAssets: this.formatNumber(finalAssets),
       finalReturn: this.formatNumber(finalReturn),
-      totalReturnRate: this.formatNumber(totalReturnRate * 100)
+      totalReturnRate: this.formatNumber(totalReturnRate * 100),
+      chartData: chartData
     });
   },
 

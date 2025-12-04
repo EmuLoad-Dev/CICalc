@@ -176,6 +176,11 @@
   flex-shrink: 0;
 }
 
+/* 图表区域 */
+.chart-section {
+  margin-bottom: 12rpx;
+}
+
 /* 收藏记录按钮 */
 .favorite-btn-wrapper {
   margin-top: 30rpx;

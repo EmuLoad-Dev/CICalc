@@ -99,4 +99,12 @@
       <text>收藏记录</text>
     </view>
   </view>
+
+  <!-- 图表区域 -->
+  <view class="chart-section">
+    <chart 
+      data="{{chartData}}" 
+      title="资产增长曲线"
+    ></chart>
+  </view>
 </view>

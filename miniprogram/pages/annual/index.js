@@ -1,4 +1,5 @@
 // pages/annual/index.js
+const calcUtils = require('../../utils/calc.js');
 
 Page({
   data: {
@@ -12,6 +13,9 @@ Page({
     annualizedRate: 0, // 年化收益率
     totalReturn: 0, // 总收益
     totalReturnRate: 0, // 总收益率
+    
+    // 图表数据
+    chartData: [],
     
     // 边界值常量
     BOUNDS: {
@@ -302,10 +306,19 @@ Page({
       annualizedRate = Math.pow(finalAmount / principal, 1 / years) - 1;
     }
 
+    // 生成时间序列数据用于图表
+    const chartData = calcUtils.generateAnnualTimeSeriesData({
+      principal,
+      finalAmount,
+      duration,
+      durationType
+    });
+
     this.setData({
       totalReturn: this.formatNumber(totalReturn),
       totalReturnRate: this.formatNumber(totalReturnRate * 100),
-      annualizedRate: this.formatNumber(annualizedRate * 100)
+      annualizedRate: this.formatNumber(annualizedRate * 100),
+      chartData: chartData
     });
   },
 
