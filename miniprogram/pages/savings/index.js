@@ -614,6 +614,49 @@ Page({
     };
   },
 
+  // 分享到朋友圈
+  onShareTimeline: function() {
+    const {
+      currentDeposit,
+      targetDeposit,
+      expectedAnnualRate,
+      depositDuration,
+      durationType,
+      monthlyDeposit,
+      totalInvestment,
+      finalAssets,
+      finalReturn,
+      totalReturnRate
+    } = this.data;
+
+    // 检查是否有有效结果
+    if (parseFloat(monthlyDeposit) <= 0 && parseFloat(totalInvestment) <= 0) {
+      return {
+        title: '存钱计划计算结果 - 极简复利计算器',
+        query: ''
+      };
+    }
+
+    // 构建分享数据，用于打开后自动填充
+    const shareData = {
+      currentDeposit: currentDeposit,
+      targetDeposit: targetDeposit,
+      expectedAnnualRate: expectedAnnualRate,
+      depositDuration: depositDuration,
+      durationType: durationType
+    };
+
+    // 构建分享标题
+    const durationUnit = durationType === 'year' ? '年' : durationType === 'month' ? '月' : '天';
+    let shareTitle = `存钱计划：当前${currentDeposit}元，目标${targetDeposit}元，每月存${monthlyDeposit}元，年化${expectedAnnualRate}%，历时${depositDuration}${durationUnit}。最终资产${finalAssets}元，收益${finalReturn}元`;
+
+    return {
+      title: shareTitle,
+      query: `share=true&data=${encodeURIComponent(JSON.stringify(shareData))}`,
+      imageUrl: '' // 可以设置分享图片
+    };
+  },
+
   // 长按分享按钮清除数据
   onShareLongPress: function() {
     wx.showModal({

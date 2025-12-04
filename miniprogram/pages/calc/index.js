@@ -628,6 +628,55 @@ Page({
     };
   },
 
+  // 分享到朋友圈
+  onShareTimeline: function() {
+    const {
+      principal,
+      fixedInvestment,
+      fixedInvestmentType,
+      annualRate,
+      duration,
+      durationType,
+      compoundPeriod,
+      totalInvestment,
+      finalAssets,
+      finalReturn,
+      totalReturnRate,
+      annualizedReturnRate
+    } = this.data;
+
+    // 检查是否有有效结果
+    if (parseFloat(totalInvestment) <= 0 && parseFloat(finalAssets) <= 0) {
+      return {
+        title: '复利计算收益结果 - 极简复利计算器',
+        query: ''
+      };
+    }
+
+    // 构建分享数据，用于打开后自动填充
+    const shareData = {
+      principal: principal,
+      fixedInvestment: fixedInvestment,
+      fixedInvestmentType: fixedInvestmentType,
+      annualRate: annualRate,
+      duration: duration,
+      durationType: durationType,
+      compoundPeriod: compoundPeriod
+    };
+
+    // 构建分享标题（朋友圈标题可以更长）
+    const fixedInvestmentText = fixedInvestmentType === 'yearly' ? '每年' : '每月';
+    const durationUnit = durationType === 'year' ? '年' : durationType === 'month' ? '月' : '天';
+    
+    let shareTitle = `复利计算：本金${principal}元，${fixedInvestmentText}定投${fixedInvestment}元，年化${annualRate}%，历时${duration}${durationUnit}。最终资产${finalAssets}元，收益${finalReturn}元，年化收益率${annualizedReturnRate}%`;
+
+    return {
+      title: shareTitle,
+      query: `share=true&data=${encodeURIComponent(JSON.stringify(shareData))}`,
+      imageUrl: '' // 可以设置分享图片
+    };
+  },
+
   // 长按分享按钮清除数据
   onShareLongPress: function() {
     wx.showModal({

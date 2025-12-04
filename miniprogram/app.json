@@ -10,7 +10,8 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTitleText": "极简复利计算器",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "shareTimeline": true
   },
   "tabBar": {
     "custom": true,

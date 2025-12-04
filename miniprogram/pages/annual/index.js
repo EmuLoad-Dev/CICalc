@@ -522,6 +522,45 @@ Page({
     };
   },
 
+  // 分享到朋友圈
+  onShareTimeline: function() {
+    const {
+      principal,
+      finalAmount,
+      duration,
+      durationType,
+      totalReturn,
+      totalReturnRate,
+      annualizedRate
+    } = this.data;
+
+    // 检查是否有有效结果
+    if (parseFloat(annualizedRate) <= 0 && parseFloat(totalReturn) <= 0) {
+      return {
+        title: '年化收益率计算结果 - 极简复利计算器',
+        query: ''
+      };
+    }
+
+    // 构建分享数据，用于打开后自动填充
+    const shareData = {
+      principal: principal,
+      finalAmount: finalAmount,
+      duration: duration,
+      durationType: durationType
+    };
+
+    // 构建分享标题
+    const durationUnit = durationType === 'year' ? '年' : durationType === 'month' ? '月' : '天';
+    let shareTitle = `年化收益率：${annualizedRate}%，本金${principal}元，最终${finalAmount}元，历时${duration}${durationUnit}。总收益${totalReturn}元，总收益率${totalReturnRate}%`;
+
+    return {
+      title: shareTitle,
+      query: `share=true&data=${encodeURIComponent(JSON.stringify(shareData))}`,
+      imageUrl: '' // 可以设置分享图片
+    };
+  },
+
   // 长按分享按钮清除数据
   onShareLongPress: function() {
     wx.showModal({
