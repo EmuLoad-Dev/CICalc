@@ -1,0 +1,504 @@
+<!--pages/home/index.wxml-->
+<view class="home-container">
+  <!-- Segment控制器 -->
+  <view class="segment-container">
+    <view 
+      class="segment-item {{currentSegment === 0 ? 'active' : ''}}"
+      data-index="0"
+      bindtap="onSegmentChange"
+    >
+      <text>计算收益</text>
+    </view>
+    <view 
+      class="segment-item {{currentSegment === 1 ? 'active' : ''}}"
+      data-index="1"
+      bindtap="onSegmentChange"
+    >
+      <text>存钱计划</text>
+    </view>
+    <view 
+      class="segment-item {{currentSegment === 2 ? 'active' : ''}}"
+      data-index="2"
+      bindtap="onSegmentChange"
+    >
+      <text>计算年化</text>
+    </view>
+  </view>
+
+  <!-- 计算收益页面内容 -->
+  <view class="segment-content" wx:if="{{currentSegment === 0}}">
+    <view class="container">
+      <!-- 结果展示区域 -->
+      <view class="result-section">
+        <view class="result-item">
+          <text class="result-label">总投资额</text>
+          <view class="result-value-wrapper">
+            <text class="result-value">{{calcData.totalInvestment}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">最终资产</text>
+          <view class="result-value-wrapper">
+            <text class="result-value">{{calcData.finalAssets}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">最终收益</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{calcData.finalReturn}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">总收益率</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{calcData.totalReturnRate}}</text>
+            <text class="result-unit">%</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">年化收益率</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{calcData.annualizedReturnRate}}</text>
+            <text class="result-unit">%</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 输入区域 -->
+      <view class="input-section">
+        <view class="input-item">
+          <text class="input-label">本金</text>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{calcData.principal}}" 
+            placeholder="0"
+            bindinput="onCalcPrincipalInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">元</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">定投</text>
+          <view class="toggle-group toggle-group-center">
+            <view 
+              class="toggle-btn {{calcData.fixedInvestmentType === 'yearly' ? 'active' : ''}}"
+              data-type="yearly"
+              bindtap="onCalcFixedInvestmentTypeChange"
+            >
+              每年
+            </view>
+            <view 
+              class="toggle-btn {{calcData.fixedInvestmentType === 'monthly' ? 'active' : ''}}"
+              data-type="monthly"
+              bindtap="onCalcFixedInvestmentTypeChange"
+            >
+              每月
+            </view>
+          </view>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{calcData.fixedInvestment}}" 
+            placeholder="0"
+            bindinput="onCalcFixedInvestmentInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">元</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">年化收益率</text>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{calcData.annualRate}}" 
+            placeholder="0"
+            bindinput="onCalcAnnualRateInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">%</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">历时</text>
+          <view class="toggle-group toggle-group-center toggle-group-duration">
+            <view 
+              class="toggle-btn toggle-btn-duration {{calcData.durationType === 'year' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="year"
+              bindtap="onCalcDurationTypeChange"
+            >
+              年
+            </view>
+            <view 
+              class="toggle-btn toggle-btn-duration {{calcData.durationType === 'month' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="month"
+              bindtap="onCalcDurationTypeChange"
+            >
+              月
+            </view>
+            <view 
+              class="toggle-btn toggle-btn-duration {{calcData.durationType === 'day' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="day"
+              bindtap="onCalcDurationTypeChange"
+            >
+              天
+            </view>
+          </view>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{calcData.duration}}" 
+            placeholder="0"
+            bindinput="onCalcDurationInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">{{calcData.durationType === 'year' ? '年' : calcData.durationType === 'month' ? '月' : '天'}}</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">复利计算周期</text>
+          <view class="toggle-group toggle-group-right">
+            <view 
+              class="toggle-btn {{calcData.compoundPeriod === 'year' ? 'active' : ''}}"
+              data-period="year"
+              bindtap="onCalcCompoundPeriodChange"
+            >
+              年
+            </view>
+            <view 
+              class="toggle-btn {{calcData.compoundPeriod === 'month' ? 'active' : ''}}"
+              data-period="month"
+              bindtap="onCalcCompoundPeriodChange"
+            >
+              月
+            </view>
+            <view 
+              class="toggle-btn {{calcData.compoundPeriod === 'day' ? 'active' : ''}}"
+              data-period="day"
+              bindtap="onCalcCompoundPeriodChange"
+            >
+              天
+            </view>
+            <view 
+              class="toggle-btn {{calcData.compoundPeriod === 'closed' ? 'active' : ''}}"
+              data-period="closed"
+              bindtap="onCalcCompoundPeriodChange"
+            >
+              封闭
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 去广告激励按钮 -->
+      <view class="ad-free-section" wx:if="{{!isAdFreeActive}}">
+        <view class="ad-free-card">
+          <view class="ad-free-icon">🎁</view>
+          <view class="ad-free-content">
+            <text class="ad-free-title">观看视频去广告</text>
+            <text class="ad-free-desc">免费享受24小时无广告体验</text>
+          </view>
+          <view class="ad-free-btn" bindtap="onWatchAd">
+            <text>立即观看</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 去广告状态显示（已激活） -->
+      <view class="ad-free-status" wx:if="{{isAdFreeActive}}">
+        <view class="ad-free-status-card">
+          <view class="ad-free-status-icon">✨</view>
+          <view class="ad-free-status-content">
+            <text class="ad-free-status-title">已开启去广告模式</text>
+            <text class="ad-free-status-time">剩余时间：{{remainingTimeText}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 分享和收藏按钮 -->
+      <view class="favorite-btn-wrapper">
+        <button class="share-btn" open-type="share" data-type="calc">
+          <text>分享结果</text>
+        </button>
+        <view class="favorite-btn" bindtap="onCalcSaveRecord">
+          <text>收藏记录</text>
+        </view>
+      </view>
+
+      <!-- 图表区域 -->
+      <view class="chart-section">
+        <chart 
+          data="{{calcData.chartData}}" 
+          title="资产增长曲线"
+        ></chart>
+      </view>
+    </view>
+  </view>
+
+  <!-- 存钱计划页面内容 -->
+  <view class="segment-content" wx:if="{{currentSegment === 1}}">
+    <view class="container">
+      <!-- 结果展示区域 -->
+      <view class="result-section">
+        <view class="result-item">
+          <text class="result-label">每月存入</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{savingsData.monthlyDeposit}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">总投资额</text>
+          <view class="result-value-wrapper">
+            <text class="result-value">{{savingsData.totalInvestment}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">最终资产</text>
+          <view class="result-value-wrapper">
+            <text class="result-value">{{savingsData.finalAssets}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">最终收益</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{savingsData.finalReturn}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">总收益率</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{savingsData.totalReturnRate}}</text>
+            <text class="result-unit">%</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 输入区域 -->
+      <view class="input-section">
+        <view class="input-item">
+          <text class="input-label">当前存款</text>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{savingsData.currentDeposit}}" 
+            placeholder="0"
+            bindinput="onSavingsCurrentDepositInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">元</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">目标存款</text>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{savingsData.targetDeposit}}" 
+            placeholder="0"
+            bindinput="onSavingsTargetDepositInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">元</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">预期年化</text>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{savingsData.expectedAnnualRate}}" 
+            placeholder="0"
+            bindinput="onSavingsExpectedAnnualRateInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">%</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">存款时长</text>
+          <view class="toggle-group toggle-group-center toggle-group-duration">
+            <view 
+              class="toggle-btn toggle-btn-duration {{savingsData.durationType === 'year' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="year"
+              bindtap="onSavingsDurationTypeChange"
+            >
+              年
+            </view>
+            <view 
+              class="toggle-btn toggle-btn-duration {{savingsData.durationType === 'month' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="month"
+              bindtap="onSavingsDurationTypeChange"
+            >
+              月
+            </view>
+            <view 
+              class="toggle-btn toggle-btn-duration {{savingsData.durationType === 'day' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="day"
+              bindtap="onSavingsDurationTypeChange"
+            >
+              天
+            </view>
+          </view>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{savingsData.depositDuration}}" 
+            placeholder="0"
+            bindinput="onSavingsDepositDurationInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">{{savingsData.durationType === 'year' ? '年' : savingsData.durationType === 'month' ? '月' : '天'}}</text>
+        </view>
+      </view>
+
+      <!-- 分享和收藏按钮 -->
+      <view class="favorite-btn-wrapper">
+        <button class="share-btn" open-type="share" data-type="savings">
+          <text>分享结果</text>
+        </button>
+        <view class="favorite-btn" bindtap="onSavingsSaveRecord">
+          <text>收藏记录</text>
+        </view>
+      </view>
+
+      <!-- 图表区域 -->
+      <view class="chart-section">
+        <chart 
+          data="{{savingsData.chartData}}" 
+          title="资产增长曲线"
+        ></chart>
+      </view>
+    </view>
+  </view>
+
+  <!-- 计算年化页面内容 -->
+  <view class="segment-content" wx:if="{{currentSegment === 2}}">
+    <view class="container">
+      <!-- 结果展示区域 -->
+      <view class="result-section">
+        <view class="result-item">
+          <text class="result-label">总收益</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{annualData.totalReturn}}</text>
+            <text class="result-unit">元</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">总收益率</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{annualData.totalReturnRate}}</text>
+            <text class="result-unit">%</text>
+          </view>
+        </view>
+        <view class="result-item">
+          <text class="result-label">年化收益率</text>
+          <view class="result-value-wrapper">
+            <text class="result-value highlight">{{annualData.annualizedRate}}</text>
+            <text class="result-unit">%</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 输入区域 -->
+      <view class="input-section">
+        <view class="input-item">
+          <text class="input-label">本金</text>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{annualData.principal}}" 
+            placeholder="0"
+            bindinput="onAnnualPrincipalInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">元</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">最终金额</text>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{annualData.finalAmount}}" 
+            placeholder="0"
+            bindinput="onAnnualFinalAmountInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">元</text>
+        </view>
+
+        <view class="input-item">
+          <text class="input-label">投资时长</text>
+          <view class="toggle-group toggle-group-center toggle-group-duration">
+            <view 
+              class="toggle-btn toggle-btn-duration {{annualData.durationType === 'year' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="year"
+              bindtap="onAnnualDurationTypeChange"
+            >
+              年
+            </view>
+            <view 
+              class="toggle-btn toggle-btn-duration {{annualData.durationType === 'month' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="month"
+              bindtap="onAnnualDurationTypeChange"
+            >
+              月
+            </view>
+            <view 
+              class="toggle-btn toggle-btn-duration {{annualData.durationType === 'day' ? 'active' : ''}}"
+              style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+              data-type="day"
+              bindtap="onAnnualDurationTypeChange"
+            >
+              天
+            </view>
+          </view>
+          <input 
+            class="input-field" 
+            type="digit" 
+            value="{{annualData.duration}}" 
+            placeholder="0"
+            bindinput="onAnnualDurationInput"
+            confirm-type="done"
+          />
+          <text class="input-unit">{{annualData.durationType === 'year' ? '年' : annualData.durationType === 'month' ? '月' : '天'}}</text>
+        </view>
+      </view>
+
+      <!-- 分享和收藏按钮 -->
+      <view class="favorite-btn-wrapper">
+        <button class="share-btn" open-type="share" data-type="annual">
+          <text>分享结果</text>
+        </button>
+        <view class="favorite-btn" bindtap="onAnnualSaveRecord">
+          <text>收藏记录</text>
+        </view>
+      </view>
+
+      <!-- 图表区域 -->
+      <view class="chart-section">
+        <chart 
+          data="{{annualData.chartData}}" 
+          title="资产增长曲线"
+        ></chart>
+      </view>
+    </view>
+  </view>
+</view>

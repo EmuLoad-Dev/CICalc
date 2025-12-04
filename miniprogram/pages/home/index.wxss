@@ -1,4 +1,54 @@
-/* pages/calc/index.wxss */
+/* pages/home/index.wxss */
+
+/* Segment控制器样式 */
+.segment-container {
+  background: #FFFFFF;
+  display: flex;
+  padding: 20rpx 15rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.segment-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 32rpx;
+  color: #666666;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.segment-item.active {
+  color: #007AFF;
+  font-weight: 600;
+}
+
+.segment-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background: #007AFF;
+  border-radius: 2rpx;
+}
+
+.segment-content {
+  min-height: calc(100vh - 100rpx);
+}
+
+/* 容器样式 */
+.home-container {
+  background: #f6f6f6;
+  min-height: 100vh;
+}
+
 .container {
   padding: 15rpx 15rpx;
   padding-bottom: 150rpx; /* 为底部 tabbar 留出空间 */
@@ -115,20 +165,28 @@
 
 /* 定投和历时的选项卡居中 */
 .toggle-group-center {
-  flex: 0 1 auto; /* 可以收缩，但不占据多余空间 */
+  flex: 0 1 auto;
   justify-content: center;
   margin-left: 20rpx;
-  margin-right: 60rpx; /* 左偏移40rpx (20rpx + 40rpx) */
-  min-width: 0; /* 允许收缩 */
+  margin-right: 60rpx;
+  min-width: 0;
 }
 
-/* 复利计算周期的选项卡右对齐，对齐到单位右侧 */
+.toggle-group-duration {
+  flex: 0 1 auto;
+  justify-content: center;
+  margin-left: 20rpx;
+  margin-right: 60rpx;
+  min-width: 0;
+}
+
+/* 复利计算周期的选项卡右对齐 */
 .toggle-group-right {
   flex: 1;
   justify-content: flex-end;
   margin-left: 20rpx;
   margin-right: 24rpx;
-  min-width: 0; /* 允许 flex 收缩 */
+  min-width: 0;
 }
 
 .toggle-btn {
@@ -153,7 +211,7 @@
   border-color: #007AFF;
 }
 
-/* 历时栏的选项卡按钮宽度 - 使用更具体的选择器确保优先级 */
+/* 历时栏的选项卡按钮宽度 */
 .toggle-btn.toggle-btn-duration,
 .toggle-btn.toggle-btn-duration.active {
   width: 90rpx !important;
@@ -170,7 +228,7 @@
   text-align: right;
   padding: 0 8rpx;
   min-height: 32rpx;
-  min-width: 150rpx; /* 确保输入框有足够的最小宽度 */
+  min-width: 150rpx;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -394,5 +452,4 @@
   line-height: 1.2;
   font-weight: 500;
 }
-
 

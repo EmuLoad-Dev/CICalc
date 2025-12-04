@@ -8,22 +8,10 @@ Component({
     borderStyle: "black",
     list: [
       {
-        pagePath: "/pages/calc/index",
-        text: "计算收益",
+        pagePath: "/pages/home/index",
+        text: "计算工具",
         iconPath: "/images/calc.png",
         selectedIconPath: "/images/calc-active.png"
-      },
-      {
-        pagePath: "/pages/savings/index",
-        text: "存钱计划",
-        iconPath: "/images/savings.png",
-        selectedIconPath: "/images/savings-active.png"
-      },
-      {
-        pagePath: "/pages/annual/index",
-        text: "计算年化",
-        iconPath: "/images/annual.png",
-        selectedIconPath: "/images/annual-active.png"
       },
       {
         pagePath: "/pages/history/index",

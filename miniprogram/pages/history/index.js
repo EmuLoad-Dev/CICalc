@@ -14,7 +14,7 @@ Page({
     // 更新tabBar选中状态
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({
-        selected: 3
+        selected: 1
       });
     }
     // 每次显示页面时重新加载历史记录（可能在其他页面有新的记录）
@@ -158,14 +158,8 @@ Page({
     app.globalData.pendingLoadRecord = record.input;
     app.globalData.pendingLoadRecordType = record.type;
 
-    // 根据类型跳转到对应页面
-    if (record.type === 'calc') {
-      wx.switchTab({ url: '/pages/calc/index' });
-    } else if (record.type === 'savings') {
-      wx.switchTab({ url: '/pages/savings/index' });
-    } else if (record.type === 'annual') {
-      wx.switchTab({ url: '/pages/annual/index' });
-    }
+    // 跳转到home页面（三个页面已合并）
+    wx.switchTab({ url: '/pages/home/index' });
   },
 
   // 重命名记录

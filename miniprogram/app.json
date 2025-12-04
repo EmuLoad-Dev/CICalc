@@ -1,8 +1,6 @@
 {
   "pages": [
-    "pages/calc/index",
-    "pages/savings/index",
-    "pages/annual/index",
+    "pages/home/index",
     "pages/history/index"
   ],
   "window": {
@@ -21,16 +19,8 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/calc/index",
-        "text": "计算收益"
-      },
-      {
-        "pagePath": "pages/savings/index",
-        "text": "存钱计划"
-      },
-      {
-        "pagePath": "pages/annual/index",
-        "text": "计算年化"
+        "pagePath": "pages/home/index",
+        "text": "计算工具"
       },
       {
         "pagePath": "pages/history/index",
