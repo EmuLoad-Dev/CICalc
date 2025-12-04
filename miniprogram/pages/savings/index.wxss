@@ -16,6 +16,15 @@
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  padding: 16rpx 0 12rpx 0;
+  border-bottom: 2rpx solid #F0F0F0;
+  margin-bottom: 8rpx;
+}
+
 .result-item {
   display: flex;
   justify-content: space-between;
@@ -79,6 +88,15 @@
   padding: 12rpx 15rpx;
   margin-bottom: 12rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.input-section .section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  padding: 16rpx 0 12rpx 0;
+  border-bottom: 2rpx solid #F0F0F0;
+  margin-bottom: 8rpx;
 }
 
 .input-item {

@@ -2,6 +2,7 @@
 <view class="container">
   <!-- 结果展示区域 -->
   <view class="result-section">
+    <view class="section-title">计算结果</view>
     <view class="result-item">
       <text class="result-label">总投资额</text>
       <view class="result-value-wrapper">
@@ -41,6 +42,7 @@
 
   <!-- 输入区域 -->
   <view class="input-section">
+    <view class="section-title">参数输入</view>
     <view class="input-item">
       <text class="input-label">本金</text>
       <input 
