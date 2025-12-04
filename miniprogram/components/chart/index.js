@@ -29,7 +29,7 @@ Component({
     canvasHeight: 0,
     ctx: null,
     padding: {
-      top: 30,
+      top: 80,
       right: 20,
       bottom: 45,
       left: 70
@@ -146,22 +146,22 @@ Component({
       this.drawAxes(ctx, padding, chartWidth, chartHeight, minTime, maxTime, minValue, maxValue, mapX, mapY);
 
       // 绘制折线
-      this.drawLine(ctx, timeData, assetsData, mapX, mapY, '#007AFF', 2);
-      this.drawLine(ctx, timeData, investmentData, mapX, mapY, '#34C759', 2);
-      this.drawLine(ctx, timeData, returnData, mapX, mapY, '#FF9500', 2);
+      this.drawLine(ctx, timeData, assetsData, mapX, mapY, '#66B3FF', 2);
+      this.drawLine(ctx, timeData, investmentData, mapX, mapY, '#7DD87F', 2);
+      this.drawLine(ctx, timeData, returnData, mapX, mapY, '#FFB366', 2);
 
       // 绘制数据点（可选，只在数据点较少时显示）
       if (data.length <= 50) {
-        this.drawPoints(ctx, timeData, assetsData, mapX, mapY, '#007AFF', 2.5);
-        this.drawPoints(ctx, timeData, investmentData, mapX, mapY, '#34C759', 2.5);
-        this.drawPoints(ctx, timeData, returnData, mapX, mapY, '#FF9500', 2.5);
+        this.drawPoints(ctx, timeData, assetsData, mapX, mapY, '#66B3FF', 2.5);
+        this.drawPoints(ctx, timeData, investmentData, mapX, mapY, '#7DD87F', 2.5);
+        this.drawPoints(ctx, timeData, returnData, mapX, mapY, '#FFB366', 2.5);
       }
-
-      // 绘制图例
-      this.drawLegend(ctx, canvasWidth, padding);
 
       // 绘制标题
       this.drawTitle(ctx, canvasWidth, padding, this.data.title);
+
+      // 绘制图例
+      this.drawLegend(ctx, canvasWidth, padding);
     },
 
     // 绘制网格线
@@ -246,12 +246,12 @@ Component({
 
       // 轴标签
       ctx.fillStyle = '#333333';
-      ctx.font = '16px sans-serif';
+      ctx.font = '12px sans-serif';
       ctx.textAlign = 'center';
       
       // X轴标签（时间）
       ctx.save();
-      ctx.translate(padding.left + chartWidth / 2, padding.top + chartHeight + 28);
+      ctx.translate(padding.left + chartWidth / 2, padding.top + chartHeight + 35);
       ctx.fillText('时间（月）', 0, 0);
       ctx.restore();
 
@@ -300,30 +300,48 @@ Component({
     // 绘制图例
     drawLegend: function(ctx, canvasWidth, padding) {
       const legendItems = [
-        { label: '累计资产', color: '#007AFF' },
-        { label: '累计投入', color: '#34C759' },
-        { label: '累计收益', color: '#FF9500' }
+        { label: '累计资产', color: '#66B3FF' },
+        { label: '累计投入', color: '#7DD87F' },
+        { label: '累计收益', color: '#FFB366' }
       ];
 
-      const legendX = canvasWidth - padding.right - 180;
-      const legendY = padding.top + 8;
-      const itemHeight = 22;
-      const itemSpacing = 6;
-
+      // 计算图例总宽度，用于水平居中
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'left';
+      const itemSpacing = 20; // 图例项之间的间距
+      const colorBlockWidth = 12;
+      const textSpacing = 8; // 颜色块和文字之间的间距
+      let totalWidth = 0;
+      legendItems.forEach((item, index) => {
+        const textWidth = ctx.measureText(item.label).width;
+        if (index > 0) {
+          totalWidth += itemSpacing;
+        }
+        totalWidth += colorBlockWidth + textSpacing + textWidth;
+      });
+
+      // 水平居中
+      const legendStartX = (canvasWidth - totalWidth) / 2;
+      const legendY = 55; // 标题下方
+      const itemHeight = 22;
+
       ctx.textBaseline = 'middle';
 
+      let currentX = legendStartX;
       legendItems.forEach((item, index) => {
-        const y = legendY + index * (itemHeight + itemSpacing);
+        const y = legendY;
         
         // 绘制颜色块
         ctx.fillStyle = item.color;
-        ctx.fillRect(legendX, y - 5, 12, 10);
+        ctx.fillRect(currentX, y - 5, colorBlockWidth, 10);
         
         // 绘制标签
         ctx.fillStyle = '#333333';
-        ctx.fillText(item.label, legendX + 18, y);
+        ctx.fillText(item.label, currentX + colorBlockWidth + textSpacing, y);
+        
+        // 更新下一个图例项的x位置
+        const textWidth = ctx.measureText(item.label).width;
+        currentX += colorBlockWidth + textSpacing + textWidth + itemSpacing;
       });
     },
 
@@ -333,7 +351,7 @@ Component({
       ctx.font = 'bold 18px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(title, canvasWidth / 2, padding.top - 25);
+      ctx.fillText(title, canvasWidth / 2, 10);
     },
 
     // 格式化数值（简化显示）

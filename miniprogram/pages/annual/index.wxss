@@ -178,6 +178,7 @@
 
 /* 收藏记录按钮 */
 .favorite-btn-wrapper {
+  margin-top: 30rpx;
   margin-bottom: 12rpx;
   display: flex;
   justify-content: center;
