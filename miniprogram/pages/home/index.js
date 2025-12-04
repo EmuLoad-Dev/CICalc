@@ -300,12 +300,21 @@ Page({
       this.calculateCalc();
     } else if (type === 'savings') {
       // 应用存钱计划模板
+      // 如果存款时长是月份且能被12整除，转换为年（更易读）
+      let depositDuration = templateData.depositDuration || 0;
+      let durationType = templateData.durationType || 'month';
+      
+      if (durationType === 'month' && depositDuration > 0 && depositDuration % 12 === 0) {
+        depositDuration = depositDuration / 12;
+        durationType = 'year';
+      }
+      
       this.setData({
         'savingsData.currentDeposit': templateData.currentDeposit || 0,
         'savingsData.targetDeposit': templateData.targetDeposit || 0,
         'savingsData.expectedAnnualRate': templateData.expectedAnnualRate || '0',
-        'savingsData.depositDuration': templateData.depositDuration || 0,
-        'savingsData.durationType': templateData.durationType || 'month'
+        'savingsData.depositDuration': depositDuration,
+        'savingsData.durationType': durationType
       });
       this.saveSavingsData();
       this.calculateSavings();
