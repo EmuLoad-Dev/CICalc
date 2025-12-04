@@ -1,5 +1,6 @@
 // pages/annual/index.js
 const calcUtils = require('../../utils/calc.js');
+const templateUtils = require('../../utils/templates.js');
 
 Page({
   data: {
@@ -16,6 +17,10 @@ Page({
     
     // 图表数据
     chartData: [],
+    
+    // 模板相关
+    showTemplateModal: false, // 是否显示模板选择弹窗
+    templateList: [], // 模板列表
     
     // 边界值常量
     BOUNDS: {
@@ -66,6 +71,81 @@ Page({
     
     // 恢复保存的数据
     this.loadSavedData();
+    this.calculate();
+    
+    // 加载模板列表
+    this.loadTemplates();
+  },
+  
+  // 加载模板列表
+  loadTemplates: function() {
+    // 获取系统模板
+    const systemTemplates = templateUtils.getTemplates('annual');
+    // 获取用户自定义模板
+    const customTemplates = templateUtils.getCustomTemplates('annual');
+    // 合并模板列表
+    const allTemplates = [...systemTemplates, ...customTemplates];
+    this.setData({
+      templateList: allTemplates
+    });
+  },
+  
+  // 显示模板选择弹窗
+  onShowTemplateModal: function() {
+    this.setData({
+      showTemplateModal: true
+    });
+  },
+  
+  // 隐藏模板选择弹窗
+  onHideTemplateModal: function() {
+    this.setData({
+      showTemplateModal: false
+    });
+  },
+  
+  // 阻止事件冒泡
+  stopPropagation: function() {
+    // 空函数，用于阻止事件冒泡
+  },
+  
+  // 选择模板
+  onSelectTemplate: function(e) {
+    const template = e.currentTarget.dataset.template;
+    if (!template || !template.data) {
+      wx.showToast({
+        title: '模板数据错误',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+    
+    // 应用模板数据
+    this.applyTemplate(template.data);
+    
+    // 关闭弹窗
+    this.onHideTemplateModal();
+    
+    // 提示用户
+    wx.showToast({
+      title: `已应用：${template.name}`,
+      icon: 'success',
+      duration: 2000
+    });
+  },
+  
+  // 应用模板数据
+  applyTemplate: function(templateData) {
+    this.setData({
+      principal: templateData.principal || 0,
+      finalAmount: templateData.finalAmount || 0,
+      duration: templateData.duration || 0,
+      durationType: templateData.durationType || 'year'
+    });
+    // 保存数据
+    this.saveData();
+    // 重新计算
     this.calculate();
   },
 

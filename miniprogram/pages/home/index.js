@@ -1,5 +1,6 @@
 // pages/home/index.js
 const calcUtils = require('../../utils/calc.js');
+const templateUtils = require('../../utils/templates.js');
 
 Page({
   data: {
@@ -69,7 +70,12 @@ Page({
         month: { min: 0, max: 1200 },
         day: { min: 0, max: 36500 }
       }
-    }
+    },
+    
+    // 模板相关
+    showTemplateModal: false, // 是否显示模板选择弹窗
+    templateList: [], // 模板列表
+    currentTemplateType: 'calc' // 当前模板类型
   },
 
   onLoad: function (options) {
@@ -104,6 +110,111 @@ Page({
     
     this.loadAllSavedData();
     this.calculateAll();
+    
+    // 加载模板列表（默认加载计算收益模板）
+    this.loadTemplates('calc');
+  },
+  
+  // 加载模板列表
+  loadTemplates: function(type) {
+    // 获取系统模板
+    const systemTemplates = templateUtils.getTemplates(type);
+    // 获取用户自定义模板
+    const customTemplates = templateUtils.getCustomTemplates(type);
+    // 合并模板列表
+    const allTemplates = [...systemTemplates, ...customTemplates];
+    this.setData({
+      templateList: allTemplates,
+      currentTemplateType: type
+    });
+  },
+  
+  // 显示模板选择弹窗
+  onShowTemplateModal: function(e) {
+    const type = e.currentTarget.dataset.type || 'calc';
+    // 根据类型加载对应的模板
+    this.loadTemplates(type);
+    this.setData({
+      showTemplateModal: true
+    });
+  },
+  
+  // 隐藏模板选择弹窗
+  onHideTemplateModal: function() {
+    this.setData({
+      showTemplateModal: false
+    });
+  },
+  
+  // 阻止事件冒泡
+  stopPropagation: function() {
+    // 空函数，用于阻止事件冒泡
+  },
+  
+  // 选择模板
+  onSelectTemplate: function(e) {
+    const template = e.currentTarget.dataset.template;
+    if (!template || !template.data) {
+      wx.showToast({
+        title: '模板数据错误',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+    
+    // 根据模板类型应用模板数据
+    const type = this.data.currentTemplateType;
+    this.applyTemplate(type, template.data);
+    
+    // 关闭弹窗
+    this.onHideTemplateModal();
+    
+    // 提示用户
+    wx.showToast({
+      title: `已应用：${template.name}`,
+      icon: 'success',
+      duration: 2000
+    });
+  },
+  
+  // 应用模板数据
+  applyTemplate: function(type, templateData) {
+    if (type === 'calc') {
+      // 应用计算收益模板
+      this.setData({
+        'calcData.principal': templateData.principal || 0,
+        'calcData.fixedInvestment': templateData.fixedInvestment || 0,
+        'calcData.fixedInvestmentType': templateData.fixedInvestmentType || 'monthly',
+        'calcData.annualRate': templateData.annualRate || '0',
+        'calcData.duration': templateData.duration || 0,
+        'calcData.durationType': templateData.durationType || 'month',
+        'calcData.compoundPeriod': templateData.compoundPeriod || 'month'
+      });
+      this.saveCalcData();
+      this.calculateCalc();
+    } else if (type === 'savings') {
+      // 应用存钱计划模板
+      this.setData({
+        'savingsData.currentDeposit': templateData.currentDeposit || 0,
+        'savingsData.targetDeposit': templateData.targetDeposit || 0,
+        'savingsData.expectedAnnualRate': templateData.expectedAnnualRate || '0',
+        'savingsData.depositDuration': templateData.depositDuration || 0,
+        'savingsData.durationType': templateData.durationType || 'month'
+      });
+      this.saveSavingsData();
+      this.calculateSavings();
+    } else if (type === 'annual') {
+      // 应用计算年化模板
+      this.setData({
+        'annualData.principal': templateData.principal || 0,
+        'annualData.finalAmount': templateData.finalAmount || 0,
+        'annualData.duration': templateData.duration || 0,
+        'annualData.durationType': templateData.durationType || 'year'
+      });
+      this.saveAnnualData();
+      this.calculateAnnual();
+    }
   },
 
   onShow: function () {

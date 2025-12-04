@@ -198,11 +198,14 @@
         </view>
       </view>
 
-      <!-- 分享和收藏按钮 -->
+      <!-- 分享、模板和收藏按钮 -->
       <view class="favorite-btn-wrapper">
         <button class="share-btn" open-type="share" data-type="calc">
           <text>分享结果</text>
         </button>
+        <view class="template-btn" bindtap="onShowTemplateModal" data-type="calc">
+          <text>选择模板</text>
+        </view>
         <view class="favorite-btn" bindtap="onCalcSaveRecord">
           <text>收藏记录</text>
         </view>
@@ -341,11 +344,14 @@
         </view>
       </view>
 
-      <!-- 分享和收藏按钮 -->
+      <!-- 分享、模板和收藏按钮 -->
       <view class="favorite-btn-wrapper">
         <button class="share-btn" open-type="share" data-type="savings">
           <text>分享结果</text>
         </button>
+        <view class="template-btn" bindtap="onShowTemplateModal" data-type="savings">
+          <text>选择模板</text>
+        </view>
         <view class="favorite-btn" bindtap="onSavingsSaveRecord">
           <text>收藏记录</text>
         </view>
@@ -457,11 +463,14 @@
         </view>
       </view>
 
-      <!-- 分享和收藏按钮 -->
+      <!-- 分享、模板和收藏按钮 -->
       <view class="favorite-btn-wrapper">
         <button class="share-btn" open-type="share" data-type="annual">
           <text>分享结果</text>
         </button>
+        <view class="template-btn" bindtap="onShowTemplateModal" data-type="annual">
+          <text>选择模板</text>
+        </view>
         <view class="favorite-btn" bindtap="onAnnualSaveRecord">
           <text>收藏记录</text>
         </view>
@@ -474,6 +483,34 @@
           title="资产增长曲线"
         ></chart>
       </view>
+    </view>
+  </view>
+
+  <!-- 模板选择弹窗 -->
+  <view class="template-modal" wx:if="{{showTemplateModal}}" bindtap="onHideTemplateModal">
+    <view class="template-modal-content" catchtap="stopPropagation">
+      <view class="template-modal-header">
+        <text class="template-modal-title">选择投资场景模板</text>
+        <view class="template-modal-close" bindtap="onHideTemplateModal">✕</view>
+      </view>
+      <scroll-view class="template-modal-body" scroll-y>
+        <view class="template-list">
+          <view 
+            class="template-item" 
+            wx:for="{{templateList}}" 
+            wx:key="id"
+            bindtap="onSelectTemplate"
+            data-template="{{item}}"
+          >
+            <view class="template-item-icon">{{item.icon}}</view>
+            <view class="template-item-content">
+              <text class="template-item-name">{{item.name}}</text>
+              <text class="template-item-desc">{{item.description}}</text>
+            </view>
+            <view class="template-item-arrow">›</view>
+          </view>
+        </view>
+      </scroll-view>
     </view>
   </view>
 </view>
