@@ -177,23 +177,31 @@
 .param-list {
   display: flex;
   flex-direction: column;
-  gap: 10rpx;
+  gap: 12rpx;
 }
 
 .param-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
   font-size: 28rpx;
+}
+
+.param-item:last-child {
+  border-bottom: none;
 }
 
 .param-label {
   color: #666666;
-  min-width: 160rpx;
+  font-size: 28rpx;
 }
 
 .param-value {
   color: #333333;
   font-weight: 500;
+  font-size: 28rpx;
 }
 
 /* 结果列表 */

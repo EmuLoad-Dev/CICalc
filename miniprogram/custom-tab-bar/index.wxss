@@ -4,7 +4,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120rpx;
+  height: 130rpx;
   background: #FFFFFF;
   display: flex;
   padding-bottom: env(safe-area-inset-bottom);
@@ -30,6 +30,9 @@
   align-items: center;
   flex-direction: column;
   position: relative;
+  padding-top: 8rpx;
+  padding-bottom: 8rpx;
+  box-sizing: border-box;
 }
 
 .tab-bar-icon {
@@ -38,7 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8rpx;
+  margin-bottom: 12rpx;
 }
 
 .tab-bar-icon-img {
@@ -49,8 +52,11 @@
 .tab-bar-text {
   font-size: 24rpx;
   color: #999999;
-  line-height: 1;
+  line-height: 1.2;
   font-weight: 400;
+  padding-top: 2rpx;
+  overflow: visible;
+  white-space: nowrap;
 }
 
 .tab-bar-item-active .tab-bar-text {

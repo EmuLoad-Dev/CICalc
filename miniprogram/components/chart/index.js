@@ -32,7 +32,7 @@ Component({
       top: 80,
       right: 20,
       bottom: 45,
-      left: 70
+      left: 50
     }
   },
 
@@ -255,12 +255,12 @@ Component({
       ctx.fillText('时间（月）', 0, 0);
       ctx.restore();
 
-      // Y轴标签（金额）
-      ctx.save();
-      ctx.translate(8, padding.top + chartHeight / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillText('金额（元）', 0, 0);
-      ctx.restore();
+      // Y轴标签（金额）- 已取消显示
+      // ctx.save();
+      // ctx.translate(8, padding.top + chartHeight / 2);
+      // ctx.rotate(-Math.PI / 2);
+      // ctx.fillText('金额（元）', 0, 0);
+      // ctx.restore();
     },
 
     // 绘制折线
