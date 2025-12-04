@@ -1,0 +1,102 @@
+<!--pages/annual/index.wxml-->
+<view class="container">
+  <!-- 结果展示区域 -->
+  <view class="result-section">
+    <view class="result-item">
+      <text class="result-label">总收益</text>
+      <view class="result-value-wrapper">
+        <text class="result-value highlight">{{totalReturn}}</text>
+        <text class="result-unit">元</text>
+      </view>
+    </view>
+    <view class="result-item">
+      <text class="result-label">总收益率</text>
+      <view class="result-value-wrapper">
+        <text class="result-value highlight">{{totalReturnRate}}</text>
+        <text class="result-unit">%</text>
+      </view>
+    </view>
+    <view class="result-item">
+      <text class="result-label">年化收益率</text>
+      <view class="result-value-wrapper">
+        <text class="result-value highlight">{{annualizedRate}}</text>
+        <text class="result-unit">%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 输入区域 -->
+  <view class="input-section">
+    <view class="input-item">
+      <text class="input-label">本金</text>
+      <input 
+        class="input-field" 
+        type="digit" 
+        value="{{principal}}" 
+        placeholder="0"
+        bindinput="onPrincipalInput"
+        confirm-type="done"
+      />
+      <text class="input-unit">元</text>
+    </view>
+
+    <view class="input-item">
+      <text class="input-label">最终金额</text>
+      <input 
+        class="input-field" 
+        type="digit" 
+        value="{{finalAmount}}" 
+        placeholder="0"
+        bindinput="onFinalAmountInput"
+        confirm-type="done"
+      />
+      <text class="input-unit">元</text>
+    </view>
+
+    <view class="input-item">
+      <text class="input-label">投资时长</text>
+      <view class="toggle-group toggle-group-center toggle-group-duration">
+        <view 
+          class="toggle-btn toggle-btn-duration {{durationType === 'year' ? 'active' : ''}}"
+          style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+          data-type="year"
+          bindtap="onDurationTypeChange"
+        >
+          年
+        </view>
+        <view 
+          class="toggle-btn toggle-btn-duration {{durationType === 'month' ? 'active' : ''}}"
+          style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+          data-type="month"
+          bindtap="onDurationTypeChange"
+        >
+          月
+        </view>
+        <view 
+          class="toggle-btn toggle-btn-duration {{durationType === 'day' ? 'active' : ''}}"
+          style="width: 90rpx; flex-shrink: 0; min-width: 90rpx; max-width: 90rpx;"
+          data-type="day"
+          bindtap="onDurationTypeChange"
+        >
+          天
+        </view>
+      </view>
+      <input 
+        class="input-field" 
+        type="digit" 
+        value="{{duration}}" 
+        placeholder="0"
+        bindinput="onDurationInput"
+        confirm-type="done"
+      />
+      <text class="input-unit">{{durationType === 'year' ? '年' : durationType === 'month' ? '月' : '天'}}</text>
+    </view>
+  </view>
+
+  <!-- 收藏记录按钮 -->
+  <view class="favorite-btn-wrapper">
+    <view class="favorite-btn" bindtap="onSaveRecord">
+      <text>收藏记录</text>
+    </view>
+  </view>
+</view>

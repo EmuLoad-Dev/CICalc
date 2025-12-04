@@ -1,0 +1,42 @@
+{
+  "pages": [
+    "pages/calc/index",
+    "pages/savings/index",
+    "pages/annual/index",
+    "pages/history/index"
+  ],
+  "window": {
+    "backgroundColor": "#FFFFFF",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "极简复利计算器",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/calc/index",
+        "text": "计算收益"
+      },
+      {
+        "pagePath": "pages/savings/index",
+        "text": "存钱计划"
+      },
+      {
+        "pagePath": "pages/annual/index",
+        "text": "计算年化"
+      },
+      {
+        "pagePath": "pages/history/index",
+        "text": "收藏记录"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

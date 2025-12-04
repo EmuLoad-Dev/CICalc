@@ -1,0 +1,12 @@
+<!--components/chart/index.wxml-->
+<view class="chart-container">
+  <canvas 
+    type="2d" 
+    id="chartCanvas" 
+    class="chart-canvas"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+  ></canvas>
+</view>
+

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "极简复利计算器",
+  "usingComponents": {
+    "chart": "../../components/chart/index"
+  }
+}
+

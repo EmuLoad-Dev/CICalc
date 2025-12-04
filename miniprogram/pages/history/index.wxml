@@ -1,0 +1,169 @@
+<!--pages/history/index.wxml-->
+<view class="container">
+  <!-- 头部操作栏 -->
+  <view class="header">
+    <text class="header-title">收藏记录</text>
+    <view class="header-actions" wx:if="{{!isEmpty}}">
+      <text class="clear-btn" bindtap="onClearAll">清空</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{isEmpty}}">
+    <text class="empty-text">暂无收藏记录</text>
+    <text class="empty-hint">点击收藏记录按钮保存计算结果</text>
+  </view>
+
+  <!-- 历史记录列表 -->
+  <scroll-view class="history-list" scroll-y="true" wx:else>
+    <view class="history-item" wx:for="{{historyList}}" wx:key="id" data-index="{{index}}" bindtap="onItemClick">
+      <!-- 记录头部 -->
+      <view class="item-header">
+        <view class="item-header-left">
+          <text class="item-name">{{item.name || '未命名记录'}}</text>
+          <view class="item-meta">
+            <text class="item-type">{{item.typeName}}</text>
+            <text class="item-time">{{item.formattedTime}}</text>
+          </view>
+        </view>
+        <view class="item-actions" catchtap="stopPropagation">
+          <text class="action-btn rename-btn" data-index="{{index}}" bindtap="onRename">重命名</text>
+          <text class="action-btn delete-btn" data-index="{{index}}" bindtap="onDelete">删除</text>
+        </view>
+      </view>
+
+      <!-- 输入参数 -->
+      <view class="item-section">
+        <text class="section-title">输入参数</text>
+        <view class="param-list">
+          <!-- 计算收益类型 -->
+          <block wx:if="{{item.type === 'calc'}}">
+            <view class="param-item">
+              <text class="param-label">本金：</text>
+              <text class="param-value">{{item.input.principal}}元</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">定投：</text>
+              <text class="param-value">{{item.input.fixedInvestment}}元/{{item.input.fixedInvestmentType === 'yearly' ? '年' : '月'}}</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">年化收益率：</text>
+              <text class="param-value">{{item.input.annualRate}}%</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">历时：</text>
+              <text class="param-value">{{item.input.duration}}{{item.input.durationType === 'year' ? '年' : item.input.durationType === 'month' ? '月' : '天'}}</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">复利周期：</text>
+              <text class="param-value">{{item.input.compoundPeriod === 'year' ? '年' : item.input.compoundPeriod === 'month' ? '月' : item.input.compoundPeriod === 'day' ? '天' : '封闭'}}</text>
+            </view>
+          </block>
+          <!-- 存钱计划类型 -->
+          <block wx:elif="{{item.type === 'savings'}}">
+            <view class="param-item">
+              <text class="param-label">当前存款：</text>
+              <text class="param-value">{{item.input.currentDeposit}}元</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">目标存款：</text>
+              <text class="param-value">{{item.input.targetDeposit}}元</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">预期年化：</text>
+              <text class="param-value">{{item.input.expectedAnnualRate}}%</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">存款时长：</text>
+              <text class="param-value">{{item.input.depositDuration}}{{item.input.durationType === 'year' ? '年' : item.input.durationType === 'month' ? '月' : '天'}}</text>
+            </view>
+          </block>
+          <!-- 计算年化类型 -->
+          <block wx:elif="{{item.type === 'annual'}}">
+            <view class="param-item">
+              <text class="param-label">本金：</text>
+              <text class="param-value">{{item.input.principal}}元</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">最终金额：</text>
+              <text class="param-value">{{item.input.finalAmount}}元</text>
+            </view>
+            <view class="param-item">
+              <text class="param-label">投资时长：</text>
+              <text class="param-value">{{item.input.duration}}{{item.input.durationType === 'year' ? '年' : item.input.durationType === 'month' ? '月' : '天'}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 计算结果 -->
+      <view class="item-section">
+        <text class="section-title">计算结果</text>
+        <view class="result-list">
+          <!-- 计算收益类型 -->
+          <block wx:if="{{item.type === 'calc'}}">
+            <view class="result-item">
+              <text class="result-label">总投资额</text>
+              <text class="result-value">{{item.result.totalInvestment}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">最终资产</text>
+              <text class="result-value highlight">{{item.result.finalAssets}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">最终收益</text>
+              <text class="result-value highlight">{{item.result.finalReturn}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">总收益率</text>
+              <text class="result-value highlight">{{item.result.totalReturnRate}}%</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">年化收益率</text>
+              <text class="result-value highlight">{{item.result.annualizedReturnRate}}%</text>
+            </view>
+          </block>
+          <!-- 存钱计划类型 -->
+          <block wx:elif="{{item.type === 'savings'}}">
+            <view class="result-item">
+              <text class="result-label">每月存入</text>
+              <text class="result-value highlight">{{item.result.monthlyDeposit}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">总投资额</text>
+              <text class="result-value">{{item.result.totalInvestment}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">最终资产</text>
+              <text class="result-value highlight">{{item.result.finalAssets}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">最终收益</text>
+              <text class="result-value highlight">{{item.result.finalReturn}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">总收益率</text>
+              <text class="result-value highlight">{{item.result.totalReturnRate}}%</text>
+            </view>
+          </block>
+          <!-- 计算年化类型 -->
+          <block wx:elif="{{item.type === 'annual'}}">
+            <view class="result-item">
+              <text class="result-label">总收益</text>
+              <text class="result-value highlight">{{item.result.totalReturn}}元</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">总收益率</text>
+              <text class="result-value highlight">{{item.result.totalReturnRate}}%</text>
+            </view>
+            <view class="result-item">
+              <text class="result-label">年化收益率</text>
+              <text class="result-value highlight">{{item.result.annualizedRate}}%</text>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
