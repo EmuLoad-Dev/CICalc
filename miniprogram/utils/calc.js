@@ -131,8 +131,8 @@ function calculateCompoundInterest(params) {
   // 最终收益
   const finalReturn = finalAssets - totalInvestment;
 
-  // 总收益率
-  const totalReturnRate = totalInvestment > 0 ? (finalReturn / totalInvestment) : 0;
+  // 总收益率 = 最终资产 / 总投资额 - 1
+  const totalReturnRate = totalInvestment > 0 ? (finalAssets / totalInvestment - 1) : 0;
 
   // 年化收益率
   const years = totalMonths / 12;

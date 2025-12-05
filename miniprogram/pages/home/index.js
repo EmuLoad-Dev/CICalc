@@ -806,7 +806,8 @@ Page({
     const totalInvestment = savingsData.currentDeposit + monthlyDeposit * months;
     const finalAssets = savingsData.targetDeposit;
     const finalReturn = finalAssets - totalInvestment;
-    const totalReturnRate = totalInvestment > 0 ? (finalReturn / totalInvestment) : 0;
+    // 总收益率 = 最终资产 / 总投资额 - 1
+    const totalReturnRate = totalInvestment > 0 ? (finalAssets / totalInvestment - 1) : 0;
 
     const chartData = calcUtils.generateSavingsTimeSeriesData({
       currentDeposit: savingsData.currentDeposit,
@@ -1030,7 +1031,8 @@ Page({
     }
 
     const totalReturn = annualData.finalAmount - annualData.principal;
-    const totalReturnRate = totalReturn / annualData.principal;
+    // 总收益率 = 最终资产 / 总投资额 - 1
+    const totalReturnRate = annualData.principal > 0 ? (annualData.finalAmount / annualData.principal - 1) : 0;
 
     let years = 0;
     if (annualData.durationType === 'year') {
