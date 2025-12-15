@@ -3,8 +3,6 @@ App({
   globalData: {
     pendingLoadRecord: null, // 待载入的记录数据
     pendingLoadRecordType: null, // 待载入的记录类型
-    pendingLoadTemplate: null, // 待载入的模板数据
-    pendingLoadTemplateType: null, // 待载入的模板类型
     // 产品信息
     productName: '极简复利计算器', // 产品名称
     appVersion: '1.8.2' // 应用版本号

@@ -1,6 +1,5 @@
 // pages/home/index.js
 const calcUtils = require('../../utils/calc.js');
-const templateUtils = require('../../utils/templates.js');
 
 Page({
   data: {
@@ -73,10 +72,6 @@ Page({
       }
     },
     
-    // 模板相关
-    showTemplateModal: false, // 是否显示模板选择弹窗
-    templateList: [], // 模板列表
-    currentTemplateType: 'calc' // 当前模板类型
   },
 
   onLoad: function (options) {
@@ -111,224 +106,6 @@ Page({
     
     this.loadAllSavedData();
     this.calculateAll();
-    
-    // 加载模板列表（默认加载计算收益模板）
-    this.loadTemplates('calc');
-  },
-  
-  // 加载模板列表
-  loadTemplates: function(type) {
-    try {
-      // 获取合并后的系统模板（每个模板包含三种计算模型）
-      const mergedTemplates = templateUtils.getAllMergedTemplates();
-      
-      // 获取所有类型的自定义模板
-      const calcCustom = templateUtils.getCustomTemplates('calc');
-      const savingsCustom = templateUtils.getCustomTemplates('savings');
-      const annualCustom = templateUtils.getCustomTemplates('annual');
-      
-      // 合并所有模板
-      const allTemplates = [
-        ...mergedTemplates,
-        ...calcCustom,
-        ...savingsCustom,
-        ...annualCustom
-      ];
-      
-      // 根据当前类型严格过滤模板，只显示有对应类型数据的模板
-      const filteredTemplates = allTemplates.filter(template => {
-        if (type === 'calc') {
-          // 计算收益：需要有calc数据
-          return template.calc;
-        } else if (type === 'savings') {
-          // 存钱计划：需要有savings数据
-          return template.savings;
-        } else if (type === 'annual') {
-          // 计算年化：需要有annual数据
-          return template.annual;
-        }
-        return false;
-      });
-      
-      this.setData({
-        templateList: filteredTemplates,
-        currentTemplateType: type
-      });
-    } catch (e) {
-      console.error('加载模板失败:', e);
-    }
-  },
-  
-  // 显示模板选择弹窗
-  onShowTemplateModal: function(e) {
-    const type = e.currentTarget.dataset.type || 'calc';
-    // 根据类型加载对应的模板
-    this.loadTemplates(type);
-    this.setData({
-      showTemplateModal: true
-    });
-  },
-  
-  // 隐藏模板选择弹窗
-  onHideTemplateModal: function() {
-    this.setData({
-      showTemplateModal: false
-    });
-  },
-  
-  // 阻止事件冒泡
-  stopPropagation: function() {
-    // 空函数，用于阻止事件冒泡
-  },
-  
-  // 选择模板
-  onSelectTemplate: function(e) {
-    const template = e.currentTarget.dataset.template;
-    if (!template) {
-      wx.showToast({
-        title: '模板数据错误',
-        icon: 'none',
-        duration: 2000
-      });
-      return;
-    }
-    
-    const type = this.data.currentTemplateType;
-    
-    // 获取对应类型的数据（由于已经过滤，这里肯定有数据）
-    let templateData = null;
-    if (type === 'calc') {
-      templateData = template.calc;
-    } else if (type === 'savings') {
-      templateData = template.savings;
-    } else if (type === 'annual') {
-      templateData = template.annual;
-    }
-    
-    // 如果是旧格式的模板（有data字段），兼容处理
-    if (!templateData && template.data) {
-      templateData = template.data;
-    }
-    
-    if (!templateData) {
-      wx.showToast({
-        title: '模板数据错误',
-        icon: 'none',
-        duration: 2000
-      });
-      return;
-    }
-    
-    // 检查目标页面是否有保存的数据
-    let hasData = false;
-    let storageKey = '';
-    
-    if (type === 'calc') {
-      storageKey = 'calc_page_data';
-    } else if (type === 'savings') {
-      storageKey = 'savings_page_data';
-    } else if (type === 'annual') {
-      storageKey = 'annual_page_data';
-    }
-
-    if (storageKey) {
-      try {
-        const savedData = wx.getStorageSync(storageKey);
-        hasData = savedData && Object.keys(savedData).length > 0;
-      } catch (e) {
-        console.error('检查数据失败:', e);
-      }
-    }
-
-    // 根据是否有数据，显示不同的提示内容
-    let content = '';
-    if (hasData) {
-      content = `确定要应用"${template.name}"模板吗？\n\n注意：当前页面已有数据，应用模板后会覆盖现有数据。`;
-    } else {
-      content = `确定要应用"${template.name}"模板吗？`;
-    }
-
-    // 询问是否应用模板
-    wx.showModal({
-      title: '应用模板',
-      content: content,
-      confirmText: '确定',
-      cancelText: '取消',
-      success: (res) => {
-        if (res.confirm) {
-          // 创建临时模板对象，包含data字段以兼容旧逻辑
-          const tempTemplate = {
-            ...template,
-            data: templateData
-          };
-          this.doApplyTemplateFromModal(type, tempTemplate);
-        }
-      }
-    });
-  },
-
-  // 执行应用模板（从弹窗选择）
-  doApplyTemplateFromModal: function(type, template) {
-    // 根据模板类型应用模板数据
-    this.applyTemplate(type, template.data);
-    
-    // 关闭弹窗
-    this.onHideTemplateModal();
-    
-    // 提示用户
-    wx.showToast({
-      title: `已应用：${template.name}`,
-      icon: 'success',
-      duration: 2000
-    });
-  },
-  
-  // 应用模板数据
-  applyTemplate: function(type, templateData) {
-    if (type === 'calc') {
-      // 应用计算收益模板
-      this.setData({
-        'calcData.principal': templateData.principal || 0,
-        'calcData.fixedInvestment': templateData.fixedInvestment || 0,
-        'calcData.fixedInvestmentType': templateData.fixedInvestmentType || 'monthly',
-        'calcData.annualRate': templateData.annualRate || '0',
-        'calcData.duration': templateData.duration || 0,
-        'calcData.durationType': templateData.durationType || 'month',
-        'calcData.compoundPeriod': templateData.compoundPeriod || 'month'
-      });
-      this.saveCalcData();
-      this.calculateCalc();
-    } else if (type === 'savings') {
-      // 应用存钱计划模板
-      // 如果存款时长是月份且能被12整除，转换为年（更易读）
-      let depositDuration = templateData.depositDuration || 0;
-      let durationType = templateData.durationType || 'month';
-      
-      if (durationType === 'month' && depositDuration > 0 && depositDuration % 12 === 0) {
-        depositDuration = depositDuration / 12;
-        durationType = 'year';
-      }
-      
-      this.setData({
-        'savingsData.currentDeposit': templateData.currentDeposit || 0,
-        'savingsData.targetDeposit': templateData.targetDeposit || 0,
-        'savingsData.expectedAnnualRate': templateData.expectedAnnualRate || '0',
-        'savingsData.depositDuration': depositDuration,
-        'savingsData.durationType': durationType
-      });
-      this.saveSavingsData();
-      this.calculateSavings();
-    } else if (type === 'annual') {
-      // 应用计算年化模板
-      this.setData({
-        'annualData.principal': templateData.principal || 0,
-        'annualData.finalAmount': templateData.finalAmount || 0,
-        'annualData.duration': templateData.duration || 0,
-        'annualData.durationType': templateData.durationType || 'year'
-      });
-      this.saveAnnualData();
-      this.calculateAnnual();
-    }
   },
 
   onShow: function () {
@@ -339,29 +116,8 @@ Page({
       });
     }
     
-    // 检查是否有待载入的模板
-    const app = getApp();
-    if (app.globalData.pendingLoadTemplate) {
-      const templateData = app.globalData.pendingLoadTemplate;
-      const templateType = app.globalData.pendingLoadTemplateType;
-      app.globalData.pendingLoadTemplate = null;
-      app.globalData.pendingLoadTemplateType = null;
-      
-      // 根据模板类型切换到对应segment并应用模板
-      if (templateType === 'calc') {
-        this.setData({ currentSegment: 0, swiperCurrent: 0 });
-        this.applyTemplate('calc', templateData);
-      } else if (templateType === 'savings') {
-        this.setData({ currentSegment: 1, swiperCurrent: 1 });
-        this.applyTemplate('savings', templateData);
-      } else if (templateType === 'annual') {
-        this.setData({ currentSegment: 2, swiperCurrent: 2 });
-        this.applyTemplate('annual', templateData);
-      }
-      return;
-    }
-    
     // 检查是否有待载入的记录
+    const app = getApp();
     if (app.globalData.pendingLoadRecord) {
       const recordData = app.globalData.pendingLoadRecord;
       const recordType = app.globalData.pendingLoadRecordType;

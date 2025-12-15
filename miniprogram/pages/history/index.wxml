@@ -1,40 +1,13 @@
 <!--pages/history/index.wxml-->
 <view class="container">
-  <!-- Segment控制器 -->
-  <view class="segment-container">
-    <view 
-      class="segment-item {{currentSegment === 0 ? 'active' : ''}}"
-      data-index="0"
-      bindtap="onSegmentChange"
-    >
-      <text>收藏记录</text>
-    </view>
-    <view 
-      class="segment-item {{currentSegment === 1 ? 'active' : ''}}"
-      data-index="1"
-      bindtap="onSegmentChange"
-    >
-      <text>场景模板</text>
-    </view>
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{isEmpty}}">
+    <text class="empty-text">暂无收藏记录</text>
+    <text class="empty-hint">点击收藏记录按钮保存计算结果</text>
   </view>
 
-  <!-- Swiper 滑动容器 -->
-  <swiper 
-    class="segment-swiper"
-    current="{{swiperCurrent}}"
-    bindchange="onSwiperChange"
-    duration="300"
-  >
-    <!-- 收藏记录页面 -->
-    <swiper-item>
-      <!-- 空状态 -->
-      <view class="empty-state" wx:if="{{isEmpty}}">
-        <text class="empty-text">暂无收藏记录</text>
-        <text class="empty-hint">点击收藏记录按钮保存计算结果</text>
-      </view>
-
-      <!-- 历史记录列表 -->
-      <scroll-view class="history-list" scroll-y="true" wx:else>
+  <!-- 历史记录列表 -->
+  <scroll-view class="history-list" scroll-y="true" wx:else>
     <view class="history-item" wx:for="{{historyList}}" wx:key="id" data-index="{{index}}" bindtap="onItemClick">
       <!-- 记录头部 -->
       <view class="item-header">
@@ -184,29 +157,5 @@
       </view>
     </view>
   </scroll-view>
-    </swiper-item>
-
-    <!-- 场景模板页面 -->
-    <swiper-item>
-      <scroll-view class="template-list" scroll-y="true">
-        <view class="template-item" 
-          wx:for="{{templateList}}" 
-          wx:key="id"
-          bindtap="onSelectTemplate"
-          data-template="{{item}}"
-        >
-          <view class="template-item-icon">{{item.icon}}</view>
-          <view class="template-item-content">
-            <text class="template-item-name">{{item.name}}</text>
-            <text class="template-item-desc">{{item.description}}</text>
-          </view>
-          <view class="template-item-arrow">›</view>
-        </view>
-        <view class="empty-state" wx:if="{{templateList.length === 0}}">
-          <text class="empty-text">暂无模板</text>
-        </view>
-      </scroll-view>
-    </swiper-item>
-  </swiper>
 </view>
 
