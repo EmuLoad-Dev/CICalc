@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "极简复利计算器",
+  "navigationBarTitleText": "风海复利计算器",
   "usingComponents": {
     "chart": "../../components/chart/index"
   }

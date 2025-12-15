@@ -4,7 +4,7 @@ App({
     pendingLoadRecord: null, // 待载入的记录数据
     pendingLoadRecordType: null, // 待载入的记录类型
     // 产品信息
-    productName: '极简复利计算器', // 产品名称
+    productName: '风海复利计算器', // 产品名称
     appVersion: '1.8.2' // 应用版本号
   },
   onLaunch: function () {
@@ -15,7 +15,7 @@ App({
   initProductInfo: function() {
     try {
       // 产品名称：使用导航栏标题（与 app.json 中的 navigationBarTitleText 保持一致）
-      this.globalData.productName = '极简复利计算器';
+      this.globalData.productName = '风海复利计算器';
       
       // 应用版本号：微信小程序无法通过API获取自己的应用版本号
       // wx.getAccountInfoSync() 返回的 version 在开发/体验版中可能为空，且不是应用版本号
