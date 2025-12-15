@@ -38,7 +38,7 @@ const calcTemplates = [
   {
     id: 'stock_fund',
     name: '股票基金',
-    description: '股票型基金（定投）',
+    description: '股票型基金',
     icon: '📊',
     type: 'calc',
     data: {
@@ -54,7 +54,7 @@ const calcTemplates = [
   {
     id: 'mixed_fund',
     name: '混合基金',
-    description: '混合型基金（定投）',
+    description: '混合型基金',
     icon: '📉',
     type: 'calc',
     data: {
@@ -70,7 +70,7 @@ const calcTemplates = [
   {
     id: 'index_fund',
     name: '指数基金',
-    description: '指数型基金（定投）',
+    description: '指数型基金',
     icon: '📈',
     type: 'calc',
     data: {
@@ -134,7 +134,7 @@ const savingsTemplates = [
   {
     id: 'savings_stock_fund',
     name: '股票基金',
-    description: '通过股票基金达成目标（定投）',
+    description: '通过股票基金达成目标',
     icon: '📊',
     type: 'savings',
     data: {
